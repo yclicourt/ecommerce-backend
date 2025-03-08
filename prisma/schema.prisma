@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  image       String
+  categories  Category[]
+  cart        Cart[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Category {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  productId   Int
+}
+
+model Order {
+  id        Int  @id @default(autoincrement())
+  num_order Int
+  cartId    Int
+  cart      Cart @relation(fields: [cartId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model Cart {
+  id            Int     @id @default(autoincrement())
+  productId     Int
+  product       Product @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  paymentId     Int
+  payment       Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  method_sendId Int
+  method_send   Send    @relation(fields: [method_sendId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  orders        Order[]
+}
+
+model Payment {
+  id             Int            @id @default(autoincrement())
+  method_payment Method_Payment
+  discount       Float
+  Cart           Cart[]
+}
+
+model Send {
+  id            Int         @id @default(autoincrement())
+  method_send   Method_Send
+  discount_send Float
+  address       String
+  cart          Cart[]
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  name     String?
+  lastname String?
+  email    String  @unique
+  address  String
+  password String
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum Method_Payment {
+  LINK_PAYMENT
+  CARD_CREDIT
+}
+
+enum Method_Send {
+  MESSAGING_FREE
+  MESSAGING_PAY
+  EXPRESS_FAST
+}
