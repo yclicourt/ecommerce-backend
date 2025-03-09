@@ -30,7 +30,6 @@ export class ProductsController {
         await this.productsService.createProductItem(createProductDto);
       res.status(HttpStatus.CREATED).json({ data });
     } catch (error: unknown) {
-      console.log(error);
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({ message: error });
@@ -51,19 +50,8 @@ export class ProductsController {
   }
 
   @Get('/:id')
-  async getProductController(@Param('id') id: number, @Res() res: Response) {
-    try {
-      const data = await this.productsService.getProductItem(id);
-      data == null
-        ? res
-            .status(HttpStatus.NOT_FOUND)
-            .json({ message: 'There is not record with that product' })
-        : res.send({ data });
-    } catch (error: unknown) {
-      return res
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ message: error });
-    }
+  async getProductController(@Param('id') id: number) {
+    return await this.productsService.getProductItem(id);
   }
 
   @Put('/:id')
@@ -87,7 +75,7 @@ export class ProductsController {
   @Delete('/:id')
   async deleteProductController(@Param('id') id: number, @Res() res: Response) {
     try {
-      await this.productsService.deleteProductItem(id);
+      return await this.productsService.deleteProductItem(id);
       res
         .status(HttpStatus.NO_CONTENT)
         .json({ message: 'Has been eliminated succefully that product' });

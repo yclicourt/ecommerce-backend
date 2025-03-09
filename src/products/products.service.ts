@@ -1,5 +1,7 @@
 import {
-  BadRequestException,
+  ConflictException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -12,12 +14,25 @@ export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
   async createProductItem(createProductDto: CreateProductDto) {
+    const productFound = await this.prisma.product.findFirst({
+      where: {
+        name: createProductDto.name,
+        description: createProductDto.description,
+        price: createProductDto.price,
+        image: createProductDto.image!,
+      },
+    });
+
+    if (productFound) {
+      throw new ConflictException(`That exist a product with that records`);
+    }
+
     const productInserted = await this.prisma.product.create({
       data: {
-        name:createProductDto.name,
-        description:createProductDto.description,
-        price:createProductDto.price,
-        image:createProductDto.image!,
+        name: createProductDto.name,
+        description: createProductDto.description,
+        price: createProductDto.price,
+        image: createProductDto.image!,
       },
     });
     return productInserted;
@@ -31,12 +46,14 @@ export class ProductsService {
   async getProductItem(id: number) {
     const productFound = await this.prisma.product.findFirst({
       where: {
-        id,
+        id: Number(id),
       },
     });
-
     if (!productFound) {
-      throw new BadRequestException(`The product by ${id} not found`);
+      throw new HttpException(
+        'That is not record with that product',
+        HttpStatus.NOT_FOUND,
+      );
     }
     return productFound;
   }
@@ -44,7 +61,7 @@ export class ProductsService {
   async updateProductItem(id: number, updateProductDto: UpdateProductDto) {
     const updatedProduct = await this.prisma.product.update({
       where: {
-        id,
+        id: Number(id),
       },
       data: updateProductDto,
     });
@@ -55,7 +72,7 @@ export class ProductsService {
   async deleteProductItem(id: number) {
     const deletedProduct = await this.prisma.product.delete({
       where: {
-        id,
+        id: Number(id),
       },
     });
 
