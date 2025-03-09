@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from 'src/prisma.service';
@@ -8,22 +12,13 @@ export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
   async createProductItem(createProductDto: CreateProductDto) {
-    const productFound = await this.prisma.product.findFirst({
-      where: {
-        name: createProductDto.name,
-        description: createProductDto.description,
-        price: createProductDto.price,
-        image: createProductDto.image,
-      },
-    });
-
-    if (!productFound) {
-      throw new BadRequestException(
-        'The product to be inserted already exists',
-      );
-    }
     const productInserted = await this.prisma.product.create({
-      data: createProductDto,
+      data: {
+        name:createProductDto.name,
+        description:createProductDto.description,
+        price:createProductDto.price,
+        image:createProductDto.image!,
+      },
     });
     return productInserted;
   }
@@ -39,6 +34,10 @@ export class ProductsService {
         id,
       },
     });
+
+    if (!productFound) {
+      throw new BadRequestException(`The product by ${id} not found`);
+    }
     return productFound;
   }
 
@@ -59,6 +58,10 @@ export class ProductsService {
         id,
       },
     });
+
+    if (!deletedProduct) {
+      throw new NotFoundException(`There not product with that ${id}`);
+    }
     return deletedProduct;
   }
 }

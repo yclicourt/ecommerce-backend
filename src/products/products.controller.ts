@@ -28,8 +28,9 @@ export class ProductsController {
     try {
       const data =
         await this.productsService.createProductItem(createProductDto);
-      res.sendStatus(201).json({ data });
+      res.status(HttpStatus.CREATED).json({ data });
     } catch (error: unknown) {
+      console.log(error);
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({ message: error });
@@ -56,7 +57,7 @@ export class ProductsController {
       data == null
         ? res
             .status(HttpStatus.NOT_FOUND)
-            .json({ message: 'There is not record with that employee' })
+            .json({ message: 'There is not record with that product' })
         : res.send({ data });
     } catch (error: unknown) {
       return res
