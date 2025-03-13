@@ -1,26 +1,84 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class CategoriesService {
-  create(createCategoryDto: CreateCategoryDto) {
-    return 'This action adds a new category';
+  constructor(private prisma: PrismaService) {}
+  async createCategoryItem(createCategoryDto: CreateCategoryDto) {
+    const categoryFound = await this.prisma.category.findFirst({
+      where: {
+        name: createCategoryDto.name,
+        description: createCategoryDto.description!,
+        productId: createCategoryDto.productId,
+      },
+    });
+
+    if (categoryFound) {
+      throw new ConflictException('That exist a category with that records ');
+    }
+    const categoryCreated = await this.prisma.category.create({
+      data: {
+        name: createCategoryDto.name,
+        description: createCategoryDto.description!,
+        productId: createCategoryDto.productId,
+      },
+    });
+    return categoryCreated;
   }
 
-  findAll() {
-    return `This action returns all categories`;
+  async getAllCategoriesItems() {
+    const categoriesFounded = await this.prisma.category.findMany({});
+    return categoriesFounded;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} category`;
+  async getCategoryItem(id: number) {
+    const categoryFounded = await this.prisma.category.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!categoryFounded) {
+      throw new HttpException(
+        'That is not record with that product',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return categoryFounded;
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
+  async updateCategoryItem(id: number, updateCategoryDto: UpdateCategoryDto) {
+    const categoriesUpdated = await this.prisma.category.update({
+      where: {
+        id,
+      },
+      data: {
+        name: updateCategoryDto.name,
+        description: updateCategoryDto.description,
+        productId: updateCategoryDto.productId,
+      },
+    });
+    return categoriesUpdated;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+  async deleteCategoryItem(id: number) {
+    const deletedCategory = await this.prisma.category.delete({
+      where: {
+        id,
+      },
+    });
+    if (!deletedCategory) {
+      throw new NotFoundException(`There not product with that ${id}`);
+    }
+
+    return deletedCategory;
   }
 }
