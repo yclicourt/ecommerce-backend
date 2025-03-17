@@ -4,8 +4,6 @@ import { AuthModule } from './auth/auth.module';
 import { CategoriesModule } from './categories/categories.module';
 import { PaymentsModule } from './payments/payments.module';
 import { OrdersModule } from './orders/orders.module';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { CartModule } from './cart/cart.module';
 import { UsersModule } from './users/users.module';
 
@@ -19,8 +17,8 @@ import { UsersModule } from './users/users.module';
     CartModule,
     UsersModule,
   ],
-  controllers: [AppController],
+  controllers: [],
 
-  providers: [AppService],
+  providers: [],
 })
 export class AppModule {}
