@@ -1,84 +1,66 @@
-import {
-  ConflictException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { HttpException, Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class CategoriesService {
   constructor(private prisma: PrismaService) {}
-  async createCategoryItem(createCategoryDto: CreateCategoryDto) {
-    const categoryFound = await this.prisma.category.findFirst({
-      where: {
-        name: createCategoryDto.name,
-        description: createCategoryDto.description!,
-        productId: createCategoryDto.productId,
-      },
-    });
-
-    if (categoryFound) {
-      throw new ConflictException('That exist a category with that records ');
-    }
-    const categoryCreated = await this.prisma.category.create({
+  async createCategoryItem(
+    productId: number,
+    data: Prisma.CategoryCreateWithoutProductInput,
+  ) {
+    return await this.prisma.category.create({
       data: {
-        name: createCategoryDto.name,
-        description: createCategoryDto.description!,
-        productId: createCategoryDto.productId,
+        ...data,
+        productId,
       },
     });
-    return categoryCreated;
   }
 
-  async getAllCategoriesItems() {
-    const categoriesFounded = await this.prisma.category.findMany({});
-    return categoriesFounded;
+  getAllCategoriesItems() {
+    return this.prisma.category.findMany({
+      include: {
+        product: {
+          select: {
+            name: true,
+            price: true,
+            image: true,
+          },
+        },
+      },
+    });
   }
 
   async getCategoryItem(id: number) {
-    const categoryFounded = await this.prisma.category.findUnique({
+    const categoryFound = await this.prisma.category.findUnique({
       where: {
         id,
       },
     });
-
-    if (!categoryFounded) {
-      throw new HttpException(
-        'That is not record with that product',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-    return categoryFounded;
+    if (!categoryFound) throw new HttpException('Category not found', 404);
+    return categoryFound;
   }
 
-  async updateCategoryItem(id: number, updateCategoryDto: UpdateCategoryDto) {
-    const categoriesUpdated = await this.prisma.category.update({
+  async updateCategoryItem(id: number, data: Prisma.CategoryUpdateInput) {
+    const categoryFound = await this.getCategoryItem(id);
+    if (!categoryFound) throw new HttpException('Category not found', 404);
+
+    return await this.prisma.category.update({
       where: {
-        id,
+        id: categoryFound.id,
       },
-      data: {
-        name: updateCategoryDto.name,
-        description: updateCategoryDto.description,
-        productId: updateCategoryDto.productId,
-      },
+      data,
     });
-    return categoriesUpdated;
   }
 
   async deleteCategoryItem(id: number) {
-    const deletedCategory = await this.prisma.category.delete({
+    const categoryFound = await this.getCategoryItem(id);
+    if (!categoryFound) throw new HttpException('Category not found', 404);
+
+    return this.prisma.category.delete({
       where: {
-        id,
+        id: categoryFound.id,
       },
     });
-    if (!deletedCategory) {
-      throw new NotFoundException(`There not product with that ${id}`);
-    }
-
-    return deletedCategory;
   }
 }
