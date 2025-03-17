@@ -32,7 +32,7 @@ export class ProductsController {
     const productFound = await this.productsService.getProductItem(id);
 
     if (!productFound)
-      throw new HttpException(`There is not product with that id ${id}`, 404);
+      throw new HttpException('Product not found', 404);
 
     return productFound;
   }

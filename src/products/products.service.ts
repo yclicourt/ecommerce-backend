@@ -7,7 +7,9 @@ export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
   createProductItem(data: Prisma.ProductCreateInput) {
-    return this.prisma.product.create({ data });
+    return this.prisma.product.create({
+      data,
+    });
   }
 
   async getAllProductsItems() {
@@ -31,15 +33,14 @@ export class ProductsService {
   }
 
   async deleteProductItem(id: number) {
-    const deletedProduct = await this.prisma.product.delete({
+    const productFound = await this.getProductItem(id);
+
+    if (!productFound) throw new HttpException('Product not Found', 404);
+
+    return await this.prisma.product.delete({
       where: {
         id,
       },
     });
-
-    if (!deletedProduct)
-      throw new HttpException('Product not found', 400);
-
-    return deletedProduct;
   }
 }
