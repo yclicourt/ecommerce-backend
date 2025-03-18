@@ -16,7 +16,7 @@ datasource db {
 model Product {
   id          Int        @id @default(autoincrement())
   name        String
-  description String?
+  description String?    @default("")
   price       Float
   image       String?
   categories  Category[]
@@ -28,7 +28,7 @@ model Product {
 model Category {
   id          Int     @id @default(autoincrement())
   name        String
-  description String?
+  description String? @default("")
   product     Product @relation(fields: [productId], references: [id])
   productId   Int
 }

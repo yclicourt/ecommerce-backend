@@ -36,6 +36,15 @@ export class CategoriesService {
       where: {
         id,
       },
+      include: {
+        product: {
+          select: {
+            name: true,
+            price: true,
+            image: true,
+          },
+        },
+      },
     });
     if (!categoryFound) throw new HttpException('Category not found', 404);
     return categoryFound;
