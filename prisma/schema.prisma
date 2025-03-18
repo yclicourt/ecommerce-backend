@@ -55,14 +55,14 @@ model Cart {
 
 model Payment {
   id             Int            @id @default(autoincrement())
-  method_payment Method_Payment
+  method_payment Method_Payment @default(CARD_CREDIT)
   discount       Float
   Cart           Cart[]
 }
 
 model Send {
   id            Int         @id @default(autoincrement())
-  method_send   Method_Send
+  method_send   Method_Send @default(MESSAGING_FREE)
   discount_send Float
   address       String
   cart          Cart[]
@@ -75,6 +75,7 @@ model User {
   email    String  @unique
   address  String
   password String
+  role     Role?    @default(USER)
   cart     Cart[]
 }
 
