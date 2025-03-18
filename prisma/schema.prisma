@@ -34,10 +34,9 @@ model Category {
 }
 
 model Order {
-  id        Int  @id @default(autoincrement())
+  id        Int    @id @default(autoincrement())
   num_order Int
-  cartId    Int
-  cart      Cart @relation(fields: [cartId], references: [id])
+  cart      Cart[]
 }
 
 model Cart {
@@ -48,7 +47,10 @@ model Cart {
   payment       Payment @relation(fields: [paymentId], references: [id])
   method_sendId Int
   method_send   Send    @relation(fields: [method_sendId], references: [id])
-  orders        Order[]
+  userId        Int
+  user          User    @relation(fields: [userId], references: [id])
+  orderId       Int
+  orders        Order   @relation(fields: [orderId], references: [id])
 }
 
 model Payment {
@@ -73,6 +75,7 @@ model User {
   email    String  @unique
   address  String
   password String
+  cart     Cart[]
 }
 
 enum Role {
