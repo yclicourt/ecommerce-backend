@@ -3,7 +3,9 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  MinLength,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateUserDto {
   @IsString()
@@ -21,9 +23,9 @@ export class CreateUserDto {
   @IsNotEmpty()
   address: string;
 
+  @Transform(({ value }) => value.trim())
   @IsString()
   @IsNotEmpty()
+  @MinLength(6)
   password: string;
-
-  
 }

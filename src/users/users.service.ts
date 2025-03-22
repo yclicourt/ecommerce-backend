@@ -14,6 +14,16 @@ export class UsersService {
     return this.prisma.user.findMany();
   }
 
+  async getUserByEmail(email: string) {
+    const userFound = await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+    if (!userFound) throw new HttpException('User not found', 404);
+    return userFound;
+  }
+
   async getUserItem(id: number) {
     const userFound = await this.prisma.user.findUnique({
       where: {

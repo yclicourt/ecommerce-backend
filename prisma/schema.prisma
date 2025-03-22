@@ -70,8 +70,8 @@ model Send {
 
 model User {
   id       Int     @id @default(autoincrement())
-  name     String?
-  lastname String?
+  name     String?  @default("user name")
+  lastname String?  @default("user lastname")
   email    String  @unique
   address  String
   password String
