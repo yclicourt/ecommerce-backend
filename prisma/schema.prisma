@@ -70,18 +70,13 @@ model Send {
 
 model User {
   id       Int     @id @default(autoincrement())
-  name     String?  @default("user name")
-  lastname String?  @default("user lastname")
+  name     String? @default("user name")
+  lastname String? @default("user lastname")
   email    String  @unique
   address  String
   password String
-  role     Role?    @default(USER)
+  role     String   @default("user")
   cart     Cart[]
-}
-
-enum Role {
-  ADMIN
-  USER
 }
 
 enum Method_Payment {

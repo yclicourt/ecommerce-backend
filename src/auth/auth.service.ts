@@ -17,11 +17,16 @@ export class AuthService {
 
     if (user) throw new HttpException('User already exists', 400);
 
-    return await this.userService.createUserItem({
+    await this.userService.createUserItem({
       address,
       email,
       password: await bcryptjs.hash(password, 10),
     });
+
+    return {
+      address,
+      email,
+    };
   }
 
   async loginUser({ email, password }: LoginAuthDto) {
@@ -30,7 +35,7 @@ export class AuthService {
     const isPasswordValid = await bcryptjs.compare(password, user.password);
     if (!isPasswordValid) throw new HttpException('Invalid Credentials', 401);
 
-    const payload = { email: user.email };
+    const payload = { email: user.email, role: user.role };
 
     return {
       token: await this.jwtService.signAsync(payload),

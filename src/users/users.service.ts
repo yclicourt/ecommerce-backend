@@ -20,7 +20,6 @@ export class UsersService {
         email,
       },
     });
-    if (!userFound) throw new HttpException('User not found', 404);
     return userFound;
   }
 
