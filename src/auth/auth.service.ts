@@ -35,7 +35,7 @@ export class AuthService {
     const isPasswordValid = await bcryptjs.compare(password, user.password);
     if (!isPasswordValid) throw new HttpException('Invalid Credentials', 401);
 
-    const payload = { email: user.email, role: user.role };
+    const payload = { email: user.email,role:user.role };
 
     return {
       token: await this.jwtService.signAsync(payload),

@@ -11,7 +11,11 @@ export class UsersService {
   }
 
   getAllUserItems() {
-    return this.prisma.user.findMany();
+    return this.prisma.user.findMany({
+      omit:{
+        password:true
+      }
+    });
   }
 
   async getUserByEmail(email: string) {
@@ -25,6 +29,9 @@ export class UsersService {
 
   async getUserItem(id: number) {
     const userFound = await this.prisma.user.findUnique({
+      omit:{
+        password:true
+      },
       where: {
         id,
       },

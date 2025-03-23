@@ -75,8 +75,13 @@ model User {
   email    String  @unique
   address  String
   password String
-  role     String   @default("user")
+  role     Role?   @default(USER)
   cart     Cart[]
+}
+
+enum Role {
+  ADMIN
+  USER
 }
 
 enum Method_Payment {
