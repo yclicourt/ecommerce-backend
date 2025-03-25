@@ -6,6 +6,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { OrdersModule } from './orders/orders.module';
 import { CartModule } from './cart/cart.module';
 import { UsersModule } from './users/users.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -16,6 +17,14 @@ import { UsersModule } from './users/users.module';
     OrdersModule,
     CartModule,
     UsersModule,
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 60000,
+          limit: 2,
+        },
+      ],
+    }),
   ],
   controllers: [],
 
