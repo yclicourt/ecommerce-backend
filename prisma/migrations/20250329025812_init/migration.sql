@@ -11,7 +11,7 @@ CREATE TYPE "Method_Send" AS ENUM ('MESSAGING_FREE', 'MESSAGING_PAY', 'EXPRESS_F
 CREATE TABLE "Product" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "description" TEXT,
+    "description" TEXT DEFAULT '',
     "price" DOUBLE PRECISION NOT NULL,
     "image" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -24,7 +24,7 @@ CREATE TABLE "Product" (
 CREATE TABLE "Category" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "description" TEXT,
+    "description" TEXT DEFAULT '',
     "productId" INTEGER NOT NULL,
 
     CONSTRAINT "Category_pkey" PRIMARY KEY ("id")
@@ -34,7 +34,6 @@ CREATE TABLE "Category" (
 CREATE TABLE "Order" (
     "id" SERIAL NOT NULL,
     "num_order" INTEGER NOT NULL,
-    "cartId" INTEGER NOT NULL,
 
     CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
 );
@@ -45,6 +44,8 @@ CREATE TABLE "Cart" (
     "productId" INTEGER NOT NULL,
     "paymentId" INTEGER NOT NULL,
     "method_sendId" INTEGER NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "orderId" INTEGER NOT NULL,
 
     CONSTRAINT "Cart_pkey" PRIMARY KEY ("id")
 );
@@ -52,7 +53,7 @@ CREATE TABLE "Cart" (
 -- CreateTable
 CREATE TABLE "Payment" (
     "id" SERIAL NOT NULL,
-    "method_payment" "Method_Payment" NOT NULL,
+    "method_payment" "Method_Payment" NOT NULL DEFAULT 'CARD_CREDIT',
     "discount" DOUBLE PRECISION NOT NULL,
 
     CONSTRAINT "Payment_pkey" PRIMARY KEY ("id")
@@ -61,7 +62,7 @@ CREATE TABLE "Payment" (
 -- CreateTable
 CREATE TABLE "Send" (
     "id" SERIAL NOT NULL,
-    "method_send" "Method_Send" NOT NULL,
+    "method_send" "Method_Send" NOT NULL DEFAULT 'MESSAGING_FREE',
     "discount_send" DOUBLE PRECISION NOT NULL,
     "address" TEXT NOT NULL,
 
@@ -71,11 +72,12 @@ CREATE TABLE "Send" (
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
-    "name" TEXT,
-    "lastname" TEXT,
+    "name" TEXT DEFAULT 'user name',
+    "lastname" TEXT DEFAULT 'user lastname',
     "email" TEXT NOT NULL,
     "address" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "role" "Role" DEFAULT 'USER',
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -87,9 +89,6 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 ALTER TABLE "Category" ADD CONSTRAINT "Category_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Order" ADD CONSTRAINT "Order_cartId_fkey" FOREIGN KEY ("cartId") REFERENCES "Cart"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Cart" ADD CONSTRAINT "Cart_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -97,3 +96,9 @@ ALTER TABLE "Cart" ADD CONSTRAINT "Cart_paymentId_fkey" FOREIGN KEY ("paymentId"
 
 -- AddForeignKey
 ALTER TABLE "Cart" ADD CONSTRAINT "Cart_method_sendId_fkey" FOREIGN KEY ("method_sendId") REFERENCES "Send"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Cart" ADD CONSTRAINT "Cart_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Cart" ADD CONSTRAINT "Cart_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
