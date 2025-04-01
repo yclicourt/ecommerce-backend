@@ -37,7 +37,7 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  @Roles(Role.ADMIN)
+  @Roles(Role.USER)
   @ApiOperation({ summary: 'Create products' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiBody({ type: CreateProductDto })
@@ -76,7 +76,7 @@ export class ProductsController {
   }
 
   @Patch(':id')
-  @Roles(Role.ADMIN)
+  @Roles(Role.USER)
   @ApiOperation({ summary: 'Update a product' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   async updateProductController(
@@ -88,7 +88,7 @@ export class ProductsController {
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a product' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
-  @Roles(Role.ADMIN)
+  @Roles(Role.USER)
   async deleteProductController(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.deleteProductItem(id);
   }
