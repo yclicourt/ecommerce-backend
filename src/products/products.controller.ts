@@ -54,6 +54,7 @@ export class ProductsController {
   })
   @ApiOperation({ summary: 'Get all products' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @Roles(Role.USER)
   getAllProductsController() {
     return this.productsService.getAllProductsItems();
   }
