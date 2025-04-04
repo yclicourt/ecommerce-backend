@@ -27,17 +27,18 @@ import {
 } from '@nestjs/swagger';
 
 @ApiTags('products')
-@ApiBearerAuth()
 @Controller('products')
 @ApiUnauthorizedResponse({
   description: 'Unauthorized Bearer Auth',
 })
-@UseGuards(AuthGuard, RolesGuard)
+
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
   @Roles(Role.USER)
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Create products' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiBody({ type: CreateProductDto })
@@ -46,7 +47,6 @@ export class ProductsController {
   }
 
   @Get()
-  @Roles(Role.USER)
   @ApiResponse({
     status: 200,
     description: 'The found record',
@@ -54,7 +54,6 @@ export class ProductsController {
   })
   @ApiOperation({ summary: 'Get all products' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
-  @Roles(Role.USER)
   getAllProductsController() {
     return this.productsService.getAllProductsItems();
   }
@@ -67,7 +66,6 @@ export class ProductsController {
   })
   @ApiOperation({ summary: 'Get a product' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
-  @Roles(Role.USER)
   async getProductController(@Param('id', ParseIntPipe) id: number) {
     const productFound = await this.productsService.getProductItem(id);
 
@@ -77,6 +75,8 @@ export class ProductsController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Roles(Role.USER)
   @ApiOperation({ summary: 'Update a product' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
@@ -89,7 +89,6 @@ export class ProductsController {
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a product' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
-  @Roles(Role.USER)
   async deleteProductController(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.deleteProductItem(id);
   }
