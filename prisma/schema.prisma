@@ -26,11 +26,21 @@ model Product {
 }
 
 model Category {
-  id          Int     @id @default(autoincrement())
-  name        String
-  description String? @default("")
-  product     Product @relation(fields: [productId], references: [id])
-  productId   Int
+  id            Int         @id @default(autoincrement())
+  name          String
+  description   String?     @default("")
+  icon          String?
+  product       Product     @relation(fields: [productId], references: [id])
+  productId     Int
+  subcategory   SubCategory @relation(fields: [subcategoryId], references: [id])
+  subcategoryId Int
+}
+
+model SubCategory {
+  id         Int        @id @default(autoincrement())
+  name       String
+  url        String
+  categories Category[]
 }
 
 model Order {

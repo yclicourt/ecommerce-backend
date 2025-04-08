@@ -22,9 +22,11 @@ export class CategoriesController {
   @ApiOperation({ summary: 'Create categories' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   async createCategoryController(
-    @Body() { productId, ...data }: CreateCategoryDto,
+    @Body() createCategoryDto: CreateCategoryDto,
   ) {
-    return await this.categoriesService.createCategoryItem(productId, data);
+    return await this.categoriesService.createCategoryItem(
+      createCategoryDto
+    );
   }
 
   @Get()
