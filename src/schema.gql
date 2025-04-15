@@ -1,0 +1,29 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Category {
+  id: Int!
+  name: String!
+  description: String
+  icon: String
+  productId: Int!
+  subcategoryId: Int!
+}
+
+type Query {
+  getAllCategoryResolver: [Category!]!
+  getCategoryResolver(id: Int!): Category!
+}
+
+type Mutation {
+  createCategoryResolver(categoryInput: CreateCategoryInputDto!): Category!
+}
+
+input CreateCategoryInputDto {
+  name: String!
+  description: String
+  icon: String
+  subcategoryId: Float!
+  productId: Float!
+}

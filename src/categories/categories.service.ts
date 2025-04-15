@@ -1,27 +1,26 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
+import { CreateCategoryInputDto } from './dto/create-category.dto';
+import { UpdateCategoryInputDto } from './dto/update-category.dto';
 
 @Injectable()
 export class CategoriesService {
   constructor(private prisma: PrismaService) {}
-  async createCategoryItem(
-    createCategoryDto: CreateCategoryDto,
-  ) {
+  
+  async createCategoryItem(createCategoryInputDto: CreateCategoryInputDto) {
     return await this.prisma.category.create({
       data: {
-        name: createCategoryDto.name,
-        description: createCategoryDto.description,
-        icon: createCategoryDto.icon,
+        name: createCategoryInputDto.name,
+        description: createCategoryInputDto.description,
+        icon: createCategoryInputDto.icon,
         product: {
           connect: {
-            id: createCategoryDto.productId,
+            id: createCategoryInputDto.productId,
           },
         },
         subcategory: {
-          connect:{
-            id: createCategoryDto.subcategoryId
+          connect: {
+            id: createCategoryInputDto.subcategoryId,
           },
         },
       },
@@ -73,7 +72,7 @@ export class CategoriesService {
     return categoryFound;
   }
 
-  async updateCategoryItem(id: number, data: Prisma.CategoryUpdateInput) {
+  async updateCategoryItem(id: number, data: UpdateCategoryInputDto) {
     const categoryFound = await this.getCategoryItem(id);
     if (!categoryFound) throw new HttpException('Category not found', 404);
 

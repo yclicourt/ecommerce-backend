@@ -1,18 +1,16 @@
+import { Field, InputType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class CreateCategoryDto {
+@InputType()
+export class CreateCategoryInputDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
     description: 'category name',
     example: 'electronic',
   })
+  @Field()
   name: string;
   @IsString()
   @IsOptional()
@@ -20,6 +18,7 @@ export class CreateCategoryDto {
     description: 'category description',
     example: 'Electronic categories',
   })
+  @Field({ nullable: true })
   description?: string;
   @IsString()
   @IsOptional()
@@ -27,6 +26,7 @@ export class CreateCategoryDto {
     description: 'category icon',
     example: 'Image Icon Category',
   })
+  @Field({ nullable: true })
   icon?: string;
 
   @IsNotEmpty()
@@ -34,6 +34,7 @@ export class CreateCategoryDto {
     description: 'subcategories by category',
     example: 'Smartphone is subcategory of Electronics Category',
   })
+  @Field()
   subcategoryId: number;
   @IsNotEmpty()
   @IsNumber()
@@ -41,5 +42,6 @@ export class CreateCategoryDto {
     description: 'product id relation',
     example: '2',
   })
+  @Field()
   productId: number;
 }

@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { SubcategoryService } from './subcategory.service';
-import { SubcategoryController } from './subcategory.controller';
+import { SubcategoryResolver } from './subcategory.resolver';
 import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
   imports: [PrismaModule],
-  controllers: [SubcategoryController],
-  providers: [SubcategoryService],
+  providers: [SubcategoryResolver, SubcategoryService],
 })
 export class SubcategoryModule {}

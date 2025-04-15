@@ -8,6 +8,10 @@ import { CartModule } from './cart/cart.module';
 import { UsersModule } from './users/users.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { SubcategoryModule } from './subcategory/subcategory.module';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
+import { SubcategoryModule } from './subcategory/subcategory.module';
 
 @Module({
   imports: [
@@ -25,6 +29,10 @@ import { SubcategoryModule } from './subcategory/subcategory.module';
           limit: 2,
         },
       ],
+    }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
     SubcategoryModule,
   ],

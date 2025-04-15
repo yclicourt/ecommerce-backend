@@ -1,53 +1,26 @@
-import { HttpException, Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
+import { CreateSubcategoryInput } from './dto/create-subcategory.input';
+import { UpdateSubcategoryInput } from './dto/update-subcategory.input';
 
 @Injectable()
 export class SubcategoryService {
-  constructor(private prisma: PrismaService) {}
-
-  async createSubcategoryItem(data: Prisma.SubCategoryCreateInput) {
-    return await this.prisma.subCategory.create({
-      data,
-    });
+  create(createSubcategoryInput: CreateSubcategoryInput) {
+    return 'This action adds a new subcategory';
   }
 
-  async getAllSubcategoriesItems() {
-    return await this.prisma.subCategory.findMany({});
+  findAll() {
+    return `This action returns all subcategory`;
   }
 
-  async getSubcategoryItem(id: number) {
-    const subcategoryFound = await this.prisma.subCategory.findUnique({
-      where: {
-        id,
-      },
-    });
-    if (!subcategoryFound)
-      throw new HttpException('Subcategory not found', 404);
-    return subcategoryFound;
+  findOne(id: number) {
+    return `This action returns a #${id} subcategory`;
   }
 
-  async updateSubcategoryItem(id: number, data: Prisma.SubCategoryUpdateInput) {
-    const subcategoryFound = await this.getSubcategoryItem(id);
-    if (!subcategoryFound)
-      throw new HttpException('Subcategory not found', 404);
-
-    return await this.prisma.subCategory.update({
-      where: {
-        id,
-      },
-      data,
-    });
+  update(id: number, updateSubcategoryInput: UpdateSubcategoryInput) {
+    return `This action updates a #${id} subcategory`;
   }
 
-  async deleteSubcategoryItem(id: number) {
-    const subcategoryFound = await this.getSubcategoryItem(id);
-    if (!subcategoryFound)
-      throw new HttpException('Subcategory not found', 404);
-    return this.prisma.subCategory.delete({
-      where: {
-        id,
-      },
-    });
+  remove(id: number) {
+    return `This action removes a #${id} subcategory`;
   }
 }
