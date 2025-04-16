@@ -1,26 +1,49 @@
-import { Injectable } from '@nestjs/common';
-import { CreateSubcategoryInput } from './dto/create-subcategory.input';
-import { UpdateSubcategoryInput } from './dto/update-subcategory.input';
+import { HttpException, Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class SubcategoryService {
-  create(createSubcategoryInput: CreateSubcategoryInput) {
-    return 'This action adds a new subcategory';
+  constructor(private readonly prisma: PrismaService) {}
+
+  createSubcategoryItem(data: Prisma.SubCategoryCreateInput) {
+    return this.prisma.subCategory.create({
+      data,
+    });
   }
 
-  findAll() {
-    return `This action returns all subcategory`;
+  getAllSubcategoryItems() {
+    return this.prisma.subCategory.findMany({});
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} subcategory`;
+  getSubcategoryItem(id: number) {
+    return this.prisma.subCategory.findUnique({
+      where: {
+        id,
+      },
+    });
   }
 
-  update(id: number, updateSubcategoryInput: UpdateSubcategoryInput) {
-    return `This action updates a #${id} subcategory`;
+  async updateSubcategoryItem(id: number, data: Prisma.SubCategoryUpdateInput) {
+    const categoryFound = await this.getSubcategoryItem(id);
+    if (!categoryFound) throw new HttpException('Subcategory not found', 404);
+
+    return this.prisma.subCategory.update({
+      where: {
+        id,
+      },
+      data,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} subcategory`;
+  async deleteSubcategoryItem(id: number) {
+    const categoryFound = await this.getSubcategoryItem(id);
+    if (!categoryFound) throw new HttpException('Subcategory not found', 404);
+
+    return this.prisma.subCategory.delete({
+      where: {
+        id,
+      },
+    });
   }
 }

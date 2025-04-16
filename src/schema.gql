@@ -2,22 +2,51 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Product {
+  """Product Id"""
+  id: Int!
+
+  """Product name"""
+  name: String!
+
+  """Product description"""
+  description: String
+
+  """Product price"""
+  price: Float!
+
+  """Product Image"""
+  image: String
+  categories: [Category!]!
+}
+
+type Subcategory {
+  """subcategory id"""
+  id: Int!
+  name: String!
+  url: String!
+}
+
 type Category {
   id: Int!
   name: String!
   description: String
   icon: String
-  productId: Int!
-  subcategoryId: Int!
+  product: Product!
+  subcategory: Subcategory!
 }
 
 type Query {
   getAllCategoryResolver: [Category!]!
   getCategoryResolver(id: Int!): Category!
+  subcategory(id: Int!): Subcategory!
 }
 
 type Mutation {
   createCategoryResolver(categoryInput: CreateCategoryInputDto!): Category!
+  createSubcategory(createSubcategoryInput: CreateSubcategoryInput!): Subcategory!
+  updateSubcategory(updateSubcategoryInput: UpdateSubcategoryInput!): Subcategory!
+  removeSubcategory(id: Int!): Subcategory!
 }
 
 input CreateCategoryInputDto {
@@ -26,4 +55,21 @@ input CreateCategoryInputDto {
   icon: String
   subcategoryId: Float!
   productId: Float!
+}
+
+input CreateSubcategoryInput {
+  """subcategory name"""
+  name: String!
+
+  """subcategory url"""
+  url: String!
+}
+
+input UpdateSubcategoryInput {
+  """subcategory name"""
+  name: String
+
+  """subcategory url"""
+  url: String
+  id: Int!
 }

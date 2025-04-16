@@ -11,7 +11,6 @@ import { SubcategoryModule } from './subcategory/subcategory.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
-import { SubcategoryModule } from './subcategory/subcategory.module';
 
 @Module({
   imports: [

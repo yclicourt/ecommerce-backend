@@ -6,7 +6,7 @@ import { UpdateCategoryInputDto } from './dto/update-category.dto';
 @Injectable()
 export class CategoriesService {
   constructor(private prisma: PrismaService) {}
-  
+
   async createCategoryItem(createCategoryInputDto: CreateCategoryInputDto) {
     return await this.prisma.category.create({
       data: {
@@ -70,6 +70,18 @@ export class CategoriesService {
     });
     if (!categoryFound) throw new HttpException('Category not found', 404);
     return categoryFound;
+  }
+
+  async getCategoryBySubcategory(subcategoryId: number) {
+    const categoryBySubcategoryFound = await this.prisma.category.findUnique({
+      where: {
+        id: subcategoryId,
+      },
+    });
+    if (!categoryBySubcategoryFound)
+      throw new HttpException('That not categories by this subcategory', 404);
+
+    return categoryBySubcategoryFound;
   }
 
   async updateCategoryItem(id: number, data: UpdateCategoryInputDto) {

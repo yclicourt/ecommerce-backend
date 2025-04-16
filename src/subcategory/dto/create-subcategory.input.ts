@@ -1,7 +1,15 @@
-import { InputType, Int, Field } from '@nestjs/graphql';
+import { InputType, Field } from '@nestjs/graphql';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 @InputType()
 export class CreateSubcategoryInput {
-  @Field(() => Int, { description: 'Example field (placeholder)' })
-  exampleField: number;
+  @Field({ description: 'subcategory name' })
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Field({ description: 'subcategory url' })
+  url: string;
 }
