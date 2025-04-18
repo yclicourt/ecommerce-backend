@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SubcategoryService } from './subcategory.service';
 import { SubcategoryResolver } from './subcategory.resolver';
-import { PrismaModule } from 'src/prisma/prisma.module';
+import { PrismaModule } from 'src/common/prisma/prisma.module';
 
 @Module({
   imports: [PrismaModule],

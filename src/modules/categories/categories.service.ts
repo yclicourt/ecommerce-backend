@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/common/prisma/prisma.service';
 import { CreateCategoryInputDto } from './dto/create-category.dto';
 import { UpdateCategoryInputDto } from './dto/update-category.dto';
 
