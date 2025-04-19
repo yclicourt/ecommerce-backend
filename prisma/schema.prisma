@@ -14,15 +14,15 @@ datasource db {
 }
 
 model Product {
-  id          Int        @id @default(autoincrement())
-  name        String
-  description String?    @default("")
-  price       Float
-  image       String?
-  categories  Category[]
-  cart        Cart[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id            Int             @id @default(autoincrement())
+  name          String
+  description   String?         @default("")
+  price         Float
+  image         String?
+  categories    Category[]
+  cart          Cart[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 }
 
 model Category {
@@ -44,10 +44,24 @@ model SubCategory {
 }
 
 model Order {
-  id        Int    @id @default(autoincrement())
-  num_order Int
-  cart      Cart[]
+  id                  Int           @id @default(autoincrement())
+  intent              INTENT        @default(CAPTURE)
+  purchase_units      Json[]
+  application_context Json
+  cart                Cart[]
 }
+/* 
+model PurchaseUnits {
+  id              Int     @id @default(autoincrement())
+  description     String
+  custom_id       String
+  invoice_id      String
+  soft_descriptor String
+  items           Product @relation(fields: [itemsId], references: [id])
+  amount          Json
+  order           Order[]
+  itemsId         Int
+} */
 
 model Cart {
   id            Int     @id @default(autoincrement())
@@ -97,6 +111,11 @@ enum Role {
 enum Method_Payment {
   LINK_PAYMENT
   CARD_CREDIT
+}
+
+enum INTENT {
+  CAPTURE
+  AUTHORIZE
 }
 
 enum Method_Send {

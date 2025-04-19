@@ -1,33 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import {
-  HOST,
   PAYPAL_API,
   PAYPAL_API_CLIENT,
   PAYPAL_API_SECRET,
 } from 'src/config/app.config';
 import axios from 'axios';
+import { PrismaService } from 'src/common/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class OrdersService {
-  async createOrderItem() {
-    const newOrder = {
-      intent: 'CAPTURE',
-      purchase_units: [
-        {
-          amount: {
-            currency_code: 'USD',
-            value: '230.00',
-          },
-        },
-      ],
-      application_context: {
-        brand_name: 'Ecommerce API',
-        landing_page: 'NO_PREFERENCE',
-        user_action: 'PAY_NOW',
-        return_url: `${HOST}/capture-order`,
-        cancel_url: `${HOST}/cancel-order`,
+  constructor(private readonly prisma: PrismaService) {}
+
+  async createOrderItem(prisma: Prisma.OrderCreateInput) {
+    const newOrder = await this.prisma.order.create({
+      data: {
+        intent: prisma.intent,
+        purchase_units: prisma.purchase_units,
+        application_context: prisma.application_context,
       },
-    };
+    });
+
+    console.log(newOrder);
 
     const params = new URLSearchParams();
     params.append('grant_type', 'client_credentials');
@@ -40,17 +34,33 @@ export class OrdersService {
         password: PAYPAL_API_SECRET,
       },
     });
-    await axios.post(`${PAYPAL_API}/v2/checkout/orders`, newOrder, {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
+    const response = await axios.post(
+      `${PAYPAL_API}/v2/checkout/orders`,
+      newOrder,
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
       },
-    });
+    );
+    console.log(response.data.links);
     return newOrder;
   }
 
-  captureOrder() {
-    
+  async captureOrder(token: string) {
+    const response = await axios.post(
+      `${PAYPAL_API}/v2/checkout/orders/${token}/capture`,
+      {},
+      {
+        auth: {
+          username: PAYPAL_API_CLIENT,
+          password: PAYPAL_API_SECRET,
+        },
+      },
+    );
+
+    console.log(response.data);
   }
 
-  cancelOrder() {}
+  
 }

@@ -1,18 +1,27 @@
-import { Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
 import { OrdersService } from './orders.service';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { mapToOrderCreateInput } from '../mappers/order.mapper';
+import { Response } from 'express';
+import { HOST } from 'src/config/app.config';
 
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post('create-order')
-  createOrderController() {
-    return this.ordersService.createOrderItem();
+  createOrderController(@Body() createOrderDto: CreateOrderDto) {
+    const orderInput = mapToOrderCreateInput(createOrderDto);
+    return this.ordersService.createOrderItem(orderInput);
   }
 
-  @Post('capture-order')
-  captureOrderController() {}
+  @Get('capture-order')
+  captureOrderController(@Query('token') token: string) {
+    return this.ordersService.captureOrder(token);
+  }
 
-  @Post('cancel-order')
-  CancelOrder() {}
+  @Get('cancel-order')
+  cancelOrder(@Res() res:Response) {
+    res.status(302).redirect(`${HOST}/orders/create-order`)
+  }
 }
