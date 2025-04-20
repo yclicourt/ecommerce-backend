@@ -50,18 +50,6 @@ model Order {
   application_context Json
   cart                Cart[]
 }
-/* 
-model PurchaseUnits {
-  id              Int     @id @default(autoincrement())
-  description     String
-  custom_id       String
-  invoice_id      String
-  soft_descriptor String
-  items           Product @relation(fields: [itemsId], references: [id])
-  amount          Json
-  order           Order[]
-  itemsId         Int
-} */
 
 model Cart {
   id            Int     @id @default(autoincrement())

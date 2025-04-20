@@ -22,8 +22,6 @@ export class OrdersService {
       },
     });
 
-    console.log(newOrder);
-
     const params = new URLSearchParams();
     params.append('grant_type', 'client_credentials');
 
@@ -35,21 +33,16 @@ export class OrdersService {
         password: PAYPAL_API_SECRET,
       },
     });
-    const response = await axios.post(
-      `${PAYPAL_API}/v2/checkout/orders`,
-      newOrder,
-      {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
+    await axios.post(`${PAYPAL_API}/v2/checkout/orders`, newOrder, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
       },
-    );
-    console.log(response.data.links);
+    });
     return newOrder;
   }
 
   async captureOrder(token: string) {
-    const response = await axios.post(
+    await axios.post(
       `${PAYPAL_API}/v2/checkout/orders/${token}/capture`,
       {},
       {
@@ -59,8 +52,6 @@ export class OrdersService {
         },
       },
     );
-
-    console.log(response.data);
   }
 
   async getAllOrdersItem() {
