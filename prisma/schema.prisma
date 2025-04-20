@@ -14,15 +14,15 @@ datasource db {
 }
 
 model Product {
-  id            Int             @id @default(autoincrement())
-  name          String
-  description   String?         @default("")
-  price         Float
-  image         String?
-  categories    Category[]
-  cart          Cart[]
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?    @default("")
+  price       Float
+  image       String?
+  categories  Category[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  cartItem    CartItem[]
 }
 
 model Category {
@@ -44,40 +44,33 @@ model SubCategory {
 }
 
 model Order {
-  id                  Int           @id @default(autoincrement())
-  intent              INTENT        @default(CAPTURE)
+  id                  Int    @id @default(autoincrement())
+  intent              INTENT @default(CAPTURE)
   purchase_units      Json[]
   application_context Json
   cart                Cart[]
 }
 
 model Cart {
-  id            Int     @id @default(autoincrement())
-  productId     Int
-  product       Product @relation(fields: [productId], references: [id])
-  paymentId     Int
-  payment       Payment @relation(fields: [paymentId], references: [id])
-  method_sendId Int
-  method_send   Send    @relation(fields: [method_sendId], references: [id])
-  userId        Int
-  user          User    @relation(fields: [userId], references: [id])
-  orderId       Int
-  orders        Order   @relation(fields: [orderId], references: [id])
+  id        Int        @id @default(autoincrement())
+  userId    Int
+  user      User       @relation(fields: [userId], references: [id])
+  orderId   Int
+  orders    Order      @relation(fields: [orderId], references: [id])
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now())
 }
 
-model Payment {
-  id             Int            @id @default(autoincrement())
-  method_payment Method_Payment @default(CARD_CREDIT)
-  discount       Float
-  Cart           Cart[]
-}
-
-model Send {
-  id            Int         @id @default(autoincrement())
-  method_send   Method_Send @default(MESSAGING_FREE)
-  discount_send Float
-  address       String
-  cart          Cart[]
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  cartId    Int
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float
+  addedAt   DateTime @default(now())
 }
 
 model User {
@@ -96,18 +89,8 @@ enum Role {
   USER
 }
 
-enum Method_Payment {
-  LINK_PAYMENT
-  CARD_CREDIT
-}
-
 enum INTENT {
   CAPTURE
   AUTHORIZE
 }
 
-enum Method_Send {
-  MESSAGING_FREE
-  MESSAGING_PAY
-  EXPRESS_FAST
-}
