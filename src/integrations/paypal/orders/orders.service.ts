@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import {
   PAYPAL_API,
   PAYPAL_API_CLIENT,
@@ -7,6 +7,7 @@ import {
 import axios from 'axios';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
+import { UpdateOrderDto } from './dto/update-order.dto';
 
 @Injectable()
 export class OrdersService {
@@ -62,5 +63,44 @@ export class OrdersService {
     console.log(response.data);
   }
 
-  
+  async getAllOrdersItem() {
+    return await this.prisma.order.findMany();
+  }
+
+  async getOrderItem(id: number) {
+    const orderFounded = await this.prisma.order.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!orderFounded) throw new HttpException('Order not found', 404);
+
+    return orderFounded;
+  }
+
+  async updateOrderItem(id: number, updateOrderDto: UpdateOrderDto) {
+    const orderFounded = await this.getOrderItem(id);
+    if (!orderFounded) throw new HttpException('Order not found', 404);
+    const orderUpdated = await this.prisma.order.update({
+      where: {
+        id: orderFounded.id,
+      },
+      data: {
+        application_context: updateOrderDto.application_context,
+        intent: updateOrderDto.intent,
+        purchase_units: updateOrderDto.purchase_units,
+      },
+    });
+    return orderUpdated;
+  }
+
+  async deleteOrderItem(id: number) {
+    const orderFounded = await this.getOrderItem(id);
+    if (!orderFounded) throw new HttpException('Order not found', 404);
+    await this.prisma.order.delete({
+      where: {
+        id,
+      },
+    });
+  }
 }
