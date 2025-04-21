@@ -11,7 +11,7 @@ export class CartController {
   @Post()
   @ApiOperation({ summary: 'Create a cart' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
-  create(@Body() createCartDto: CreateCartDto) {
+  createCartController(@Body() createCartDto: CreateCartDto) {
     return this.cartService.addItemToCart(createCartDto);
   }
 }
