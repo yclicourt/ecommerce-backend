@@ -52,14 +52,18 @@ model Order {
 }
 
 model Cart {
-  id        Int        @id @default(autoincrement())
-  userId    Int
-  user      User       @relation(fields: [userId], references: [id])
-  orderId   Int
-  orders    Order      @relation(fields: [orderId], references: [id])
-  items     CartItem[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @default(now())
+  id             Int        @id @default(autoincrement())
+  userId         Int
+  user           User       @relation(fields: [userId], references: [id])
+  orderId        Int
+  orders         Order      @relation(fields: [orderId], references: [id])
+  items          CartItem[]
+  currency       String
+  discountAmount Int
+  taxAmount      Int
+  shippingAmount Int
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @default(now())
 }
 
 model CartItem {
@@ -93,4 +97,3 @@ enum INTENT {
   CAPTURE
   AUTHORIZE
 }
-
