@@ -3,7 +3,7 @@ import { IsNotEmpty, IsNumber } from 'class-validator';
 export class CartItemDto {
   @IsNumber()
   @IsNotEmpty()
-  cartId: number;
+  cartId?: number;
   @IsNumber()
   @IsNotEmpty()
   productId: number;

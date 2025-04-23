@@ -1,7 +1,8 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CartItemDto } from './dto/cart-item.dto';
 
 @ApiTags('cart')
 @Controller('cart')
@@ -11,7 +12,18 @@ export class CartController {
   @Post()
   @ApiOperation({ summary: 'Create a cart' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
-  createCartController(@Body() createCartDto: CreateCartDto) {
+  addItemCartController(@Body() createCartDto: CreateCartDto) {
     return this.cartService.addItemToCart(createCartDto);
+  }
+
+  @Get()
+  disponibilityStockController(
+    @Body() createCartDto: CreateCartDto,
+    cartItemDto: CartItemDto,
+  ) {
+    return this.cartService.validateDisponibilityStock(
+      createCartDto,
+      cartItemDto,
+    );
   }
 }
