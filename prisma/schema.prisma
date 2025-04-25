@@ -52,24 +52,24 @@ model Order {
 }
 
 model Cart {
-  id             Int        @id @default(autoincrement())
+  id             Int      @id @default(autoincrement())
   userId         Int
-  user           User       @relation(fields: [userId], references: [id])
+  user           User     @relation(fields: [userId], references: [id])
   orderId        Int
-  orders         Order      @relation(fields: [orderId], references: [id])
-  items          CartItem[]
+  orders         Order    @relation(fields: [orderId], references: [id])
+  cartItemId     Int
+  cartItems      CartItem @relation(fields: [cartItemId], references: [id])
   currency       String
   discountAmount Int
   taxAmount      Int
   shippingAmount Int
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now())
 }
 
 model CartItem {
   id        Int      @id @default(autoincrement())
-  cartId    Int
-  cart      Cart     @relation(fields: [cartId], references: [id])
+  carts     Cart[]
   productId Int
   product   Product  @relation(fields: [productId], references: [id])
   quantity  Int

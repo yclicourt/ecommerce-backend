@@ -1,34 +1,104 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { ConflictException, HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { CreateCartDto } from './dto/create-cart.dto';
-import { toPrismaCartItems } from './mappers/cart.mapper';
 import { CartItemDto } from './dto/cart-item.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class CartService {
   constructor(private prisma: PrismaService) {}
 
-  async addItemToCart(createCartDto: CreateCartDto) {
-    const { items, ...cartData } = createCartDto;
-    const { tax, discounts } = this.calculateTotalTaxes(createCartDto);
-    return await this.prisma.cart.create({
-      data: {
-        ...cartData,
-        items: {
-          createMany: toPrismaCartItems(items, cartData.userId),
+  private cartItems: CartItemDto[] = [];
+
+  // Method to add cart
+  async addCart(createCartDto: CreateCartDto) {
+    try {
+      const { tax, discounts } = this.calculateTotalTaxes(createCartDto);
+      return await this.prisma.cart.create({
+        data: {
+          currency: createCartDto.currency,
+          cartItemId: createCartDto.cartItemId,
+          orderId: createCartDto.orderId,
+          userId: createCartDto.userId,
+          shippingAmount: createCartDto.shippingAmount,
+          discountAmount: discounts,
+          taxAmount: tax,
         },
-        discountAmount: discounts,
-        taxAmount: tax,
+      });
+    } catch (err: unknown) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2003') {
+          throw new ConflictException('The Field dont not exist in the table');
+        }
+      }
+      throw err;
+    }
+  }
+
+  // Method to add item to cart
+  addItemCart(createItemCartDto: CartItemDto) {
+    return this.prisma.cartItem.create({
+      data: {
+        price: createItemCartDto.price,
+        productId: createItemCartDto.productId,
+        quantity: createItemCartDto.quantity,
       },
     });
   }
 
-  calculateTotalTaxes({ items, taxAmount }: CreateCartDto) {
-    const subtotal = items.reduce(
+  // All items added to the cart
+  getAllCartItems() {
+    return this.prisma.cartItem.findMany({
+      include: {
+        carts: {
+          select: {
+            orders: {
+              select: {
+                purchase_units: true,
+              },
+            },
+            currency: true,
+            shippingAmount: true,
+            taxAmount: true,
+            discountAmount: true,
+            user: {
+              select: {
+                name: true,
+                lastname: true,
+              },
+            },
+          },
+        },
+        product: {
+          select: {
+            name: true,
+            description: true,
+            categories: {
+              select: {
+                name: true,
+                subcategory: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  // Total calculation with taxes and discounts
+  calculateTotalTaxes({ taxAmount }: CreateCartDto) {
+    const subtotal = this.cartItems.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0,
     );
-    const discounts = items.reduce((sum, discount) => sum + discount.price, 0);
+    const discounts = this.cartItems.reduce(
+      (sum, discount) => sum + discount.price,
+      0,
+    );
 
     const tax = subtotal + taxAmount;
 
@@ -37,6 +107,7 @@ export class CartService {
     return { totals, discounts, tax, subtotal };
   }
 
+  //Check the number of items in stock
   async checkInStock(productId: number) {
     const stockProduct = await this.prisma.cartItem.findUnique({
       where: {
@@ -49,10 +120,7 @@ export class CartService {
     return stockProduct;
   }
 
-  async validateDisponibilityStock(
-    { items }: CreateCartDto,
-    { productId, quantity }: CartItemDto,
-  ) {
+  async validateDisponibilityStock({ productId, quantity }: CartItemDto) {
     const productFound = await this.checkInStock(productId);
 
     if (!productFound) {
@@ -60,11 +128,11 @@ export class CartService {
     }
 
     if (quantity >= 0) {
-      items.push(productFound);
+      this.cartItems.push(productFound);
     } else {
       throw new Error('Insufficient stock');
     }
 
-    return items;
+    return this.cartItems;
   }
 }

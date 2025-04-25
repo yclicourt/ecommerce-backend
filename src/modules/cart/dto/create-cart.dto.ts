@@ -8,9 +8,9 @@ export class CreateCartDto {
   @IsNumber()
   @IsNotEmpty()
   orderId: number;
+  @IsNumber()
   @IsNotEmpty()
-  @IsArray()
-  items: CartItemDto[];
+  cartItemId: number;
   @IsNumber()
   @IsNotEmpty()
   discountAmount: number;

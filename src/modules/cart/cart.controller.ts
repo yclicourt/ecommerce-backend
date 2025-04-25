@@ -13,17 +13,23 @@ export class CartController {
   @ApiOperation({ summary: 'Create a cart' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   addItemCartController(@Body() createCartDto: CreateCartDto) {
-    return this.cartService.addItemToCart(createCartDto);
+    return this.cartService.addCart(createCartDto);
+  }
+
+  @Post('item')
+  @ApiOperation({ summary: 'Create a cart item' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  addItemController(@Body() createItemCartDto: CartItemDto) {
+    return this.cartService.addItemCart(createItemCartDto);
+  }
+  
+  @Get('item')
+  getAllItemsCartsController() {
+    return this.cartService.getAllCartItems();
   }
 
   @Get()
-  disponibilityStockController(
-    @Body() createCartDto: CreateCartDto,
-    cartItemDto: CartItemDto,
-  ) {
-    return this.cartService.validateDisponibilityStock(
-      createCartDto,
-      cartItemDto,
-    );
+  disponibilityStockController(@Body() cartItemDto: CartItemDto) {
+    return this.cartService.validateDisponibilityStock(cartItemDto);
   }
 }
