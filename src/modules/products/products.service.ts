@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 
@@ -33,14 +33,22 @@ export class ProductsService {
   }
 
   async deleteProductItem(id: number) {
-    const productFound = await this.getProductItem(id);
+    try {
+      const productFound = await this.getProductItem(id);
 
-    if (!productFound) throw new HttpException('Product not Found', 404);
+      if (!productFound) throw new HttpException('Product not Found', 404);
 
-    return await this.prisma.product.delete({
-      where: {
-        id,
-      },
-    });
+      return await this.prisma.product.delete({
+        where: {
+          id,
+        },
+      });
+    } catch (err: any) {
+      if (err.code === 'P2003') {
+        throw new NotFoundException('Product not found');
+      } else {
+        throw err;
+      }
+    }
   }
 }
