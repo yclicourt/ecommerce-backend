@@ -20,9 +20,9 @@ model Product {
   price       Float
   image       String?
   categories  Category[]
+  cartItems   CartItem[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  cartItem    CartItem[]
 }
 
 model Category {
