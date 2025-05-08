@@ -31,12 +31,11 @@ import {
 @ApiUnauthorizedResponse({
   description: 'Unauthorized Bearer Auth',
 })
-
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  @Roles(Role.USER)
+  @Roles(Role.ADMIN,Role.MANAGER)
   @ApiBearerAuth()
   @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Create products' })
@@ -77,7 +76,7 @@ export class ProductsController {
   @Patch(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.USER)
+  @Roles(Role.ADMIN, Role.MANAGER)
   @ApiOperation({ summary: 'Update a product' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   async updateProductController(
@@ -87,6 +86,7 @@ export class ProductsController {
     return this.productsService.updateProductItem(id, updateProductDto);
   }
   @Delete(':id')
+  @Roles(Role.ADMIN, Role.MANAGER)
   @ApiOperation({ summary: 'Delete a product' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   async deleteProductController(@Param('id', ParseIntPipe) id: number) {
