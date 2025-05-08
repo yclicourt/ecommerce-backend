@@ -8,6 +8,7 @@ export class LoginAuthDto extends OmitType(CreateUserDto, [
   'address',
   'name',
   'lastname',
+  'role'
 ]) {
   @IsEmail()
   @IsNotEmpty()
