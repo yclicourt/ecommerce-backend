@@ -1,14 +1,17 @@
 import {
+  IsDate,
   IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
+  Min,
   MinLength,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Role } from 'src/modules/auth/common/enums/role.enum';
+import { Role } from 'src/features/auth/common/enums/role.enum';
 
 export class CreateUserDto {
   @IsString()
@@ -53,6 +56,19 @@ export class CreateUserDto {
   password: string;
 
   @IsNotEmpty()
+  @IsNumber()
+  @Min(9)
+  phone: number;
+
+  @IsNotEmpty()
   @IsEnum(Role, { each: true })
   role: Role[];
+
+  @IsOptional()
+  @IsDate()
+  createdAt?: Date;
+
+  @IsOptional()
+  @IsDate()
+  updatedAt?: Date;
 }
