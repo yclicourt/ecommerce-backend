@@ -25,9 +25,8 @@ export class UsersService {
           const upperRole = role.toUpperCase().trim();
 
           // Manejar posibles discrepancias de nombres
-          if (upperRole === 'MANAGER') return Role.MANAGER; // Ejemplo: convertir MANAGER a ADMIN
-          if (upperRole === 'GUEST') return Role.GUEST;
           if (upperRole === 'ADMIN') return Role.ADMIN;
+          if (upperRole === 'USER') return Role.USER;
 
           // Verificar contra el enum
           if (Object.values(Role).includes(upperRole as Role)) {

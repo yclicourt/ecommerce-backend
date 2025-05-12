@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
-import { UsersService } from 'src/modules/users/users.service';
+import { UsersService } from 'src/features/users/users.service';
 import * as bcryptjs from 'bcryptjs';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -18,7 +18,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async registerUser({ address, email, password, role }: CreateAuthDto) {
+  async registerUser({ address, email, password, role, phone }: CreateAuthDto) {
     const user = await this.userService.getUserByEmail(email);
 
     if (user) throw new HttpException('User already exists', 400);
@@ -26,6 +26,7 @@ export class AuthService {
     await this.userService.createUserItem({
       address,
       email,
+      phone,
       password: await bcryptjs.hash(password, 10),
       role,
     });
@@ -81,9 +82,8 @@ export class AuthService {
           const upperRole = role.toUpperCase().trim();
 
           // Manejar posibles discrepancias de nombres
-          if (upperRole === 'MANAGER') return Role.MANAGER;
-          if (upperRole === 'GUEST') return Role.GUEST;
           if (upperRole === 'ADMIN') return Role.ADMIN;
+          if (upperRole === 'USER') return Role.USER;
 
           // Verificar contra el enum
           if (Object.values(Role).includes(upperRole as Role)) {

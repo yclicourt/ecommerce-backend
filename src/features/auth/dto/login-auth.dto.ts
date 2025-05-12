@@ -2,13 +2,14 @@ import { OmitType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
-import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
+import { CreateUserDto } from 'src/features/users/dto/create-user.dto';
 
 export class LoginAuthDto extends OmitType(CreateUserDto, [
   'address',
   'name',
   'lastname',
-  'role'
+  'role',
+  'phone',
 ]) {
   @IsEmail()
   @IsNotEmpty()
