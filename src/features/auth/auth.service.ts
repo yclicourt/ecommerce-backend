@@ -18,7 +18,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async registerUser({ address, email, password, role, phone }: CreateAuthDto) {
+  async registerUser({ address, email, password, phone }: CreateAuthDto) {
     const user = await this.userService.getUserByEmail(email);
 
     if (user) throw new HttpException('User already exists', 400);
@@ -28,13 +28,11 @@ export class AuthService {
       email,
       phone,
       password: await bcryptjs.hash(password, 10),
-      role,
     });
 
     return {
       address,
       email,
-      role,
     };
   }
 
@@ -53,8 +51,11 @@ export class AuthService {
         roles: userRoles,
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const {password: _,createdAt:__,updatedAt:___,...safeUser} = user
       return {
         token: await this.jwtService.signAsync(payload),
+        user:safeUser
       };
     } catch (error) {
       if (error instanceof Error) {

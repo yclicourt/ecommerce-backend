@@ -60,9 +60,9 @@ export class CreateUserDto {
   @Min(9)
   phone: number;
 
-  @IsNotEmpty()
-  @IsEnum(Role, { each: true })
-  role: Role[];
+  @IsOptional()
+  @IsEnum(Role, { each: false })
+  role?: Role[];
 
   @IsOptional()
   @IsDate()
