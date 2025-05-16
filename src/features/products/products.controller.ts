@@ -74,9 +74,9 @@ export class ProductsController {
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Roles(Role.ADMIN)
+  @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Update a product' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   async updateProductController(
@@ -86,7 +86,9 @@ export class ProductsController {
     return this.productsService.updateProductItem(id, updateProductDto);
   }
   @Delete(':id')
+  @ApiBearerAuth()
   @Roles(Role.ADMIN)
+  @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Delete a product' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   async deleteProductController(@Param('id', ParseIntPipe) id: number) {
