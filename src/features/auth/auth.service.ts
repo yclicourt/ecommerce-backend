@@ -18,13 +18,15 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async registerUser({ address, email, password, phone }: CreateAuthDto) {
+  async registerUser({ address, email, password, phone,name,lastname }: CreateAuthDto) {
     const user = await this.userService.getUserByEmail(email);
 
     if (user) throw new HttpException('User already exists', 400);
 
     await this.userService.createUserItem({
       address,
+      name,
+      lastname,
       email,
       phone,
       password: await bcryptjs.hash(password, 10),

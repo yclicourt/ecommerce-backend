@@ -85,8 +85,8 @@ model CartItem {
 
 model User {
   id        Int      @id @default(autoincrement())
-  name      String?  @default("user name")
-  lastname  String?  @default("user lastname")
+  name      String   @default("user name")
+  lastname  String   @default("user lastname")
   email     String   @unique
   phone     Int      @unique
   address   String
