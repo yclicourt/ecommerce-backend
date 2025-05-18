@@ -84,17 +84,19 @@ model CartItem {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String   @default("user name")
-  lastname  String   @default("user lastname")
-  email     String   @unique
-  phone     Int      @unique
-  address   String
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  role      Role[]   @default([USER])
-  cart      Cart[]
+  id               Int      @id @default(autoincrement())
+  name             String   @default("user name")
+  lastname         String   @default("user lastname")
+  email            String   @unique
+  phone            Int      @unique
+  address          String
+  password         String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @default(now())
+  role             Role[]   @default([USER])
+  resetToken       String?
+  resetTokenExpiry DateTime? @default(now())
+  cart             Cart[]
 }
 
 enum Role {

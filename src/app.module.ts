@@ -11,6 +11,8 @@ import { SubcategoryModule } from './features/subcategory/subcategory.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
+import { MailModule } from './integrations/mail/mail.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { join } from 'path';
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
     SubcategoryModule,
+    ConfigModule.forRoot(),
+    MailModule,
   ],
   controllers: [],
 
