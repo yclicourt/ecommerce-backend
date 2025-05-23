@@ -27,8 +27,8 @@ model Product {
   image       String?
   categories  Category[]
   cartItems   CartItem[]
-  createdAt   DateTime?   @default(now())
-  updatedAt   DateTime?   @updatedAt
+  createdAt   DateTime?  @default(now())
+  updatedAt   DateTime?  @updatedAt
 }
 
 model Category {
@@ -84,16 +84,19 @@ model CartItem {
 }
 
 model User {
-  id               Int      @id @default(autoincrement())
-  name             String   @default("user name")
-  lastname         String   @default("user lastname")
-  email            String   @unique
-  phone            Int      @unique
+  id               Int       @id @default(autoincrement())
+  name             String    @default("user name")
+  lastname         String    @default("user lastname")
+  email            String    @unique
+  phone            String    @unique
   address          String
   password         String
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @default(now())
-  role             Role[]   @default([USER])
+  avatar           String?
+  status           Status    @default(INACTIVE)
+  lastLogin        DateTime  @default(now())
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @default(now())
+  role             Role[]    @default([USER])
   resetToken       String?
   resetTokenExpiry DateTime? @default(now())
   cart             Cart[]
@@ -102,6 +105,11 @@ model User {
 enum Role {
   ADMIN
   USER
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
 }
 
 enum INTENT {
