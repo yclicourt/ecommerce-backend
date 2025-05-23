@@ -6,12 +6,14 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  Min,
+  Length,
+  Matches,
   MinLength,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Role } from 'src/features/auth/common/enums/role.enum';
+import { Status } from '../common/enums/status.enum';
 
 export class CreateUserDto {
   @IsString()
@@ -56,13 +58,43 @@ export class CreateUserDto {
   password: string;
 
   @IsNotEmpty()
-  @IsNumber()
-  @Min(9)
-  phone: number;
+  @IsString()
+  @Matches(/^[0-9]+$/, { message: 'Phone number must contain only digits' })
+  @Length(9,12,{ message: 'Phone number must be between 9 and 12 digits' })
+  @Transform(({ value }) => value.toString())
+  @ApiProperty({
+    description: 'phone number user',
+    example: '585857586',
+  })
+  phone: string;
 
   @IsOptional()
   @IsEnum(Role, { each: false })
+  @ApiProperty({
+    description: 'Role user',
+    example: 'ADMIN',
+  })
   role?: Role[];
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'avatar user',
+    example: 'http://imagen.com',
+  })
+  avatar: string | null;
+
+  @IsOptional()
+  @IsEnum(Status)
+  @ApiProperty({
+    description: 'Role user',
+    example: 'ACTIVE',
+  })
+  status?: Status;
+
+  @IsOptional()
+  @IsDate()
+  lastLogin?: Date;
 
   @IsOptional()
   @IsDate()

@@ -5,7 +5,6 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
 import { UsersService } from 'src/features/users/users.service';
 import * as bcryptjs from 'bcryptjs';
 import { LoginAuthDto } from './dto/login-auth.dto';
@@ -17,6 +16,8 @@ import { PrismaService } from 'src/common/prisma/prisma.service';
 import * as crypto from 'crypto';
 import { ConfigService } from '@nestjs/config';
 import { MailService } from 'src/integrations/mail/mail.service';
+import { Status } from '../users/common/enums/status.enum';
+import { RegisterUserPayload } from './interfaces/register-user-payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -35,7 +36,8 @@ export class AuthService {
     phone,
     name,
     lastname,
-  }: CreateAuthDto) {
+    avatar,
+  }: RegisterUserPayload) {
     const user = await this.userService.getUserByEmail(email);
 
     if (user) throw new HttpException('User already exists', 400);
@@ -47,8 +49,8 @@ export class AuthService {
       email,
       phone,
       password: await bcryptjs.hash(password, 10),
+      avatar,
     });
-
     return {
       address,
       email,
@@ -57,14 +59,29 @@ export class AuthService {
 
   async loginUser({ email, password }: LoginAuthDto) {
     try {
+      // Verify if user exists
       const user = await this.userService.getUserByEmail(email);
       if (!user) throw new HttpException('Invalid Credentials', 401);
 
+      // Only reject if the user has a previous login and was marked as inactive
+      if (user.status === 'INACTIVE' && user.lastLogin === null) {
+        throw new HttpException('Account is not active', 401);
+      }
+
+      // Verify if user is same as the one in the database
       const isPasswordValid = await bcryptjs.compare(password, user.password);
       if (!isPasswordValid) throw new HttpException('Invalid Credentials', 401);
 
+      // Update status to ACTIVE
+      await this.userService.updateUserStatus(user.id, {
+        status: Status.ACTIVE,
+        lastLogin: new Date(),
+      });
+
+      // Getting user roles
       const userRoles = this.validateAndNormalizeRoles(user.role);
 
+      // Payload for JWT
       const payload: JwtPayload = {
         email: user.email,
         roles: userRoles,

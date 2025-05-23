@@ -1,21 +1,66 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from 'src/features/users/dto/create-user.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FileUploadService } from 'src/common/file-upload/file-upload.service';
+import { CreateAuthDto } from './dto/create-auth.dto';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly fileUploadService: FileUploadService,
+  ) {}
 
   @Post('register')
+  @UseInterceptors(
+    FileInterceptor('avatar', {
+      limits: {
+        fileSize: 1024 * 1024 * 5, // 5MB
+      },
+      fileFilter: (req, file, cb) => {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+          return cb(new Error('Only image files are allowed'), false);
+        }
+        cb(null, true);
+      },
+    }),
+  )
   @ApiOperation({ summary: 'Register a user' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
-  registerUserController(@Body() createAuthDto: CreateUserDto) {
-    return this.authService.registerUser(createAuthDto);
+  async registerUserController(
+    @UploadedFile() avatar: Express.Multer.File,
+    @Body() createAuthDto: CreateAuthDto,
+  ) {
+    try {
+      let avatarUrl: string | undefined = undefined;
+      if (avatar) {
+        // Upload the file and get the file name
+        const fileName = await this.fileUploadService.uploadFile(avatar);
+
+        // Build the full URL that will be served statically
+        avatarUrl = `/uploads/${fileName}`;
+      }
+
+      const userData = {
+        ...createAuthDto,
+        avatar: avatarUrl,
+      };
+
+      return this.authService.registerUser(userData);
+    } catch (error) {
+      console.error('Error en registerUserController:', error);
+    }
   }
 
   @Post('login')
