@@ -42,4 +42,9 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     example: 'mypassword',
   })
   password?: string;
+
+  @IsString()
+  @IsOptional()
+  phone?: string | undefined;
+
 }

@@ -69,7 +69,7 @@ export class CreateUserDto {
   phone: string;
 
   @IsOptional()
-  @IsEnum(Role, { each: false })
+  @IsEnum(Role, { each: true })
   @ApiProperty({
     description: 'Role user',
     example: 'ADMIN',

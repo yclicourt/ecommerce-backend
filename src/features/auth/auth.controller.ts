@@ -29,7 +29,7 @@ export class AuthController {
         fileSize: 1024 * 1024 * 5, // 5MB
       },
       fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
           return cb(new Error('Only image files are allowed'), false);
         }
         cb(null, true);
