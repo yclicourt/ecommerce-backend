@@ -9,6 +9,8 @@ import {
   ParseIntPipe,
   HttpException,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -25,6 +27,8 @@ import {
   ApiResponse,
   ApiBody,
 } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FileUploadService } from 'src/common/file-upload/file-upload.service';
 
 @ApiTags('products')
 @Controller('products')
@@ -32,7 +36,10 @@ import {
   description: 'Unauthorized Bearer Auth',
 })
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(
+    private readonly productsService: ProductsService,
+    private readonly fileUploadService: FileUploadService,
+  ) {}
 
   @Post()
   @Roles(Role.ADMIN)
@@ -41,8 +48,40 @@ export class ProductsController {
   @ApiOperation({ summary: 'Create products' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiBody({ type: CreateProductDto })
-  createProductController(@Body() createProductDto: CreateProductDto) {
-    return this.productsService.createProductItem(createProductDto);
+  @UseInterceptors(
+    FileInterceptor('image', {
+      limits: {
+        fileSize: 1024 * 1024 * 5, // 5MB
+      },
+      fileFilter: (req, file, cb) => {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
+          return cb(new Error('Only image files are allowed'), false);
+        }
+        cb(null, true);
+      },
+    }),
+  )
+  async createProductController(
+    @UploadedFile() image: Express.Multer.File,
+    @Body() createProductDto: CreateProductDto,
+  ) {
+    try {
+      let imageProductUrl: string | undefined = undefined;
+
+      if (image) {
+        const fileName = await this.fileUploadService.uploadFile(image);
+        imageProductUrl = `/uploads/${fileName}`;
+      }
+
+      const createData = {
+        ...createProductDto,
+        ...(imageProductUrl && { image: imageProductUrl }),
+      };
+      return this.productsService.createProductItem(createData);
+    } catch (error) {
+      console.error('Error in createUserController:', error);
+      throw error;
+    }
   }
 
   @Get()
@@ -79,11 +118,41 @@ export class ProductsController {
   @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Update a product' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @UseInterceptors(
+    FileInterceptor('image', {
+      limits: {
+        fileSize: 1024 * 1024 * 5, // 5MB
+      },
+      fileFilter: (req, file, cb) => {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
+          return cb(new Error('Only image files are allowed'), false);
+        }
+        cb(null, true);
+      },
+    }),
+  )
   async updateProductController(
     @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() image: Express.Multer.File,
     @Body() updateProductDto: UpdateProductDto,
   ) {
-    return this.productsService.updateProductItem(id, updateProductDto);
+    try {
+      let imageProductUrl: string | undefined = undefined;
+
+      if (image) {
+        const fileName = await this.fileUploadService.uploadFile(image);
+        imageProductUrl = `/uploads/${fileName}`;
+      }
+
+      const updateData = {
+        ...updateProductDto,
+        ...(imageProductUrl && { image: imageProductUrl }),
+      };
+      return this.productsService.updateProductItem(id, updateData);
+    } catch (error) {
+      console.error('Error in createUserController:', error);
+      throw error;
+    }
   }
   @Delete(':id')
   @ApiBearerAuth()

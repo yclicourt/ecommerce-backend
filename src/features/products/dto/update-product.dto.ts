@@ -17,7 +17,7 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {
     description: 'product price',
     example: '3000',
   })
-  price?: number | undefined;
+  price?: string | undefined;
   @ApiPropertyOptional({
     description: 'product image',
     example: 'image.com',
