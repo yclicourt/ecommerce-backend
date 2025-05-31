@@ -25,14 +25,17 @@ export class OrdersService {
     const params = new URLSearchParams();
     params.append('grant_type', 'client_credentials');
 
-    const {
-      data: { access_token },
-    } = await axios.post(`${PAYPAL_API}/v1/oauth2/token`, params, {
-      auth: {
-        username: PAYPAL_API_CLIENT,
-        password: PAYPAL_API_SECRET,
+    const response = await axios.post<{ access_token: string }>(
+      `${PAYPAL_API}/v1/oauth2/token`,
+      params,
+      {
+        auth: {
+          username: PAYPAL_API_CLIENT,
+          password: PAYPAL_API_SECRET,
+        },
       },
-    });
+    );
+    const { access_token } = response.data;
     await axios.post(`${PAYPAL_API}/v2/checkout/orders`, newOrder, {
       headers: {
         Authorization: `Bearer ${access_token}`,
