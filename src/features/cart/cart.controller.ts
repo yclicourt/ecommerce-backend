@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Delete,
+  ParseIntPipe,
+  Param,
+} from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -22,7 +30,7 @@ export class CartController {
   addItemController(@Body() createItemCartDto: CartItemDto) {
     return this.cartService.addItemCart(createItemCartDto);
   }
-  
+
   @Get('item')
   getAllItemsCartsController() {
     return this.cartService.getAllCartItems();
@@ -32,4 +40,9 @@ export class CartController {
   disponibilityStockController(@Body() cartItemDto: CartItemDto) {
     return this.cartService.validateDisponibilityStock(cartItemDto);
   }
+
+  @Delete('item/:id')
+  removeItemCartController(@Param('id', ParseIntPipe) cartItemId: number) {
+    return this.cartService.deleteItemCart(cartItemId);
+  } 
 }

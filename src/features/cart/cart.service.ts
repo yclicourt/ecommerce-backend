@@ -42,6 +42,7 @@ export class CartService {
         price: createItemCartDto.price,
         productId: createItemCartDto.productId,
         quantity: createItemCartDto.quantity,
+        name: createItemCartDto.name,
       },
     });
   }
@@ -120,6 +121,7 @@ export class CartService {
     return stockProduct;
   }
 
+  // Check disponibility in stock
   async validateDisponibilityStock({ productId, quantity }: CartItemDto) {
     const productFound = await this.checkInStock(productId);
 
@@ -134,5 +136,30 @@ export class CartService {
     }
 
     return this.cartItems;
+  }
+
+  // Delet Item into Cart
+  async deleteItemCart(cartItemId: number) {
+    try {
+      const itemFound = await this.checkInStock(cartItemId);
+      if (!itemFound) throw new HttpException('Item not Found', 404);
+
+      await this.prisma.cartItem.delete({
+        where: {
+          id: itemFound.id,
+        },
+      });
+      return { message: 'Item removed from cart successfully' };
+    } catch (error: unknown) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2003') {
+          throw new ConflictException('Item not exists');
+        }
+        if (error.code === 'P2025') {
+          throw new ConflictException('Record to delete does not exists');
+        }
+      }
+      throw error;
+    }
   }
 }

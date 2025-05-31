@@ -1,7 +1,8 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { RegisterProductPayload } from './interfaces/register-product-payload.interface';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProductsService {
@@ -50,12 +51,13 @@ export class ProductsService {
           id,
         },
       });
-    } catch (err: any) {
-      if (err.code === 'P2003') {
-        throw new NotFoundException('Product not found');
-      } else {
-        throw err;
+    } catch (err: unknown) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2003') {
+          throw new ConflictException('The Field dont not exist in the table');
+        }
       }
+      throw err;
     }
   }
 }
