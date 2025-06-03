@@ -1,0 +1,5 @@
+-- CreateEnum
+CREATE TYPE "StatusOrder" AS ENUM ('CREATED', 'SAVED', 'APPROVED', 'VOIDED', 'COMPLETED', 'PAYER_ACTION_REQUIRED');
+
+-- AlterTable
+ALTER TABLE "Order" ADD COLUMN     "statusOrder" "StatusOrder" NOT NULL DEFAULT 'CREATED';

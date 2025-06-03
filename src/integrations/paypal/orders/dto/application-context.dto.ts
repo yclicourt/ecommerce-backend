@@ -12,13 +12,13 @@ export class ApplicationContextDto {
 
   @IsString()
   @IsNotEmpty()
-  brand_name: string;
+  brand_name?: string;
 
   @IsString()
-  @IsNotEmpty()
-  landing_page: string;
+  @IsOptional()
+  landing_page?: string;
 
   @IsString({})
-  @IsNotEmpty()
-  user_action: string;
+  @IsOptional()
+  user_action?: string;
 }
