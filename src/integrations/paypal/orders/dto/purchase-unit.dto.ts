@@ -1,4 +1,3 @@
-import { Product } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   IsObject,
@@ -15,6 +14,13 @@ class AmountDto {
   @IsString()
   @IsNotEmpty()
   value: string;
+  @IsOptional()
+  breakdown?: {
+    item_total: {
+      currency_code: string;
+      value: string | number;
+    };
+  };
 }
 
 export class PurchaseUnitDto {
@@ -41,5 +47,13 @@ export class PurchaseUnitDto {
   amount: AmountDto;
 
   @IsOptional()
-  items?: Product;
+  items?: Array<{
+    name: string;
+    unit_amount: {
+      value: string;
+      currency_code?: string;
+    };
+    quantity: string | number;
+    description?: string;
+  }>;
 }

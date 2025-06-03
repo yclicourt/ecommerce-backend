@@ -4,14 +4,15 @@ import {
   IsEnum,
   IsNotEmpty,
   IsObject,
+  IsOptional,
   ValidateNested,
 } from 'class-validator';
 import { INTENT } from '../../enums/order.enum';
 import { PurchaseUnitDto } from './purchase-unit.dto';
 import { ApplicationContextDto } from './application-context.dto';
-import { Prisma } from '@prisma/client';
+import { StatusOrder } from '@prisma/client';
 
-export class CreateOrderDto implements Partial<Prisma.OrderCreateInput> {
+export class PaypalCreateOrderDto {
   @IsEnum(INTENT)
   @IsNotEmpty()
   intent: INTENT;
@@ -27,4 +28,8 @@ export class CreateOrderDto implements Partial<Prisma.OrderCreateInput> {
   @ValidateNested()
   @Type(() => ApplicationContextDto)
   application_context: ApplicationContextDto;
+
+  @IsEnum(StatusOrder)
+  @IsOptional()
+  statusOrder?: StatusOrder;
 }

@@ -50,11 +50,21 @@ model SubCategory {
 }
 
 model Order {
-  id                  Int    @id @default(autoincrement())
-  intent              INTENT @default(CAPTURE)
+  id                  Int         @id @default(autoincrement())
+  intent              INTENT      @default(CAPTURE)
+  paypalOrderId       String?     @unique
+  capturedAt          DateTime?
   purchase_units      Json[]
   application_context Json
+  statusOrder         StatusOrder @default(CREATED)
   cart                Cart[]
+}
+
+model Transaction {
+  id                 String      @id @default(uuid())
+  statusTransactions StatusOrder @default(CREATED)
+  purchase_units     Json[]
+  payer              Json
 }
 
 model Cart {
@@ -111,6 +121,15 @@ enum Role {
 enum Status {
   ACTIVE
   INACTIVE
+}
+
+enum StatusOrder {
+  CREATED
+  SAVED
+  APPROVED
+  VOIDED
+  COMPLETED
+  PAYER_ACTION_REQUIRED
 }
 
 enum INTENT {
