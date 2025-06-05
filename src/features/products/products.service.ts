@@ -18,7 +18,15 @@ export class ProductsService {
   }
 
   async getAllProductsItems() {
-    const productsFounds = await this.prisma.product.findMany({});
+    const productsFounds = await this.prisma.product.findMany({
+      include: {
+        categories: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
     return productsFounds;
   }
 
