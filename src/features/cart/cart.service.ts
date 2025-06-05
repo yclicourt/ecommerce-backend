@@ -77,11 +77,6 @@ export class CartService {
             categories: {
               select: {
                 name: true,
-                subcategory: {
-                  select: {
-                    name: true,
-                  },
-                },
               },
             },
           },
