@@ -32,13 +32,12 @@ model Product {
 }
 
 model Category {
-  id            Int         @id @default(autoincrement())
-  name          String
-  description   String?     @default("")
-  product       Product     @relation(fields: [productId], references: [id])
-  productId     Int
+  id          Int          @id @default(autoincrement())
+  name        CategoryName @default(SHOES)
+  description String?      @default("")
+  product     Product      @relation(fields: [productId], references: [id])
+  productId   Int
 }
-
 
 model Order {
   id                  Int         @id @default(autoincrement())
@@ -126,4 +125,10 @@ enum StatusOrder {
 enum INTENT {
   CAPTURE
   AUTHORIZE
+}
+
+enum CategoryName {
+  SHOES
+  FASHIONS
+  ELECTRONICS
 }

@@ -22,6 +22,7 @@ export class OrdersService {
     private readonly mailService: MailService,
   ) {}
 
+  // Method to create a order item
   async createOrderItem(prisma: PaypalCreateOrderDto) {
     // Creating order in Paypal
     const params = new URLSearchParams();
@@ -119,6 +120,7 @@ export class OrdersService {
     }
   }
 
+  // Method to handle a capture order
   async captureOrder(token: string) {
     // Capture a payment in Paypal
     const response = await axios.post<PayPalCaptureOrderResponse>(
@@ -161,10 +163,12 @@ export class OrdersService {
     }
   }
 
+  // Method to get all orders items
   async getAllOrdersItem() {
     return await this.prisma.order.findMany();
   }
 
+  // Method to get a order item
   async getOrderItem(id: number) {
     const orderFounded = await this.prisma.order.findUnique({
       where: {
@@ -176,6 +180,7 @@ export class OrdersService {
     return orderFounded;
   }
 
+  // Method to update a order item
   async updateOrderItem(id: number, updateOrderDto: UpdateOrderDto) {
     const orderFounded = await this.getOrderItem(id);
     if (!orderFounded) throw new HttpException('Order not found', 404);
@@ -192,6 +197,7 @@ export class OrdersService {
     return orderUpdated;
   }
 
+  // Method to delete a order item
   async deleteOrderItem(id: number) {
     const orderFounded = await this.getOrderItem(id);
     if (!orderFounded) throw new HttpException('Order not found', 404);

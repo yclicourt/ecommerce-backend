@@ -6,6 +6,7 @@ import { PayPalCaptureOrderResponse } from '../paypal/orders/interfaces/paypal-c
 export class MailService {
   constructor(private readonly configService: ConfigService) {}
 
+  // Method to config a transport email
   emailTransport() {
     const transporter = nodemailer.createTransport({
       host: this.configService.get<string>('SMTP_HOST'),
@@ -19,6 +20,7 @@ export class MailService {
     return transporter;
   }
 
+  // Method to handle reset password
   async sendPasswordResetEmail(
     email: string,
     name: string,
@@ -46,6 +48,7 @@ export class MailService {
     }
   }
 
+  // Method to handle a send confirmation order
   async sendConfirmationOrderEmail(
     order: PayPalCaptureOrderResponse,
   ): Promise<void> {

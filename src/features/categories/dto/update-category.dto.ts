@@ -1,4 +1,20 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateCategoryDto } from './create-category.dto';
+import { CategoryName } from '@prisma/client';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
-export class UpdateCategoryDto extends PartialType(CreateCategoryDto) {}
+export class UpdateCategoryDto {
+  @IsEnum(CategoryName)
+  @IsOptional()
+  name?: CategoryName;
+  @IsString()
+  @IsOptional()
+  description?: string;
+  @IsNumber()
+  @IsNotEmpty()
+  productId?: number;
+}

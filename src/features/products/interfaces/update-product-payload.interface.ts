@@ -1,7 +1,7 @@
 import { CategoryName } from 'src/features/categories/enums/category-name.enum';
-import { CreateProductDto } from '../dto/create-product.dto';
+import { UpdateProductDto } from '../dto/update-product.dto';
 
-export type RegisterProductPayload = Omit<CreateProductDto, 'categories'> & {
+export type UpdateProductPayload = Omit<UpdateProductDto, 'categories'> & {
   image?: string;
   categories?: Array<{ name: CategoryName; description?: string }>;
 };

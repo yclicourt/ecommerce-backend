@@ -1,5 +1,4 @@
-import { Category } from "src/features/categories/entities/category.entity";
-
+import { Category } from 'src/features/categories/entities/category.entity';
 
 export class Product {
   id: number;
