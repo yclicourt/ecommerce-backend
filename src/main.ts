@@ -7,6 +7,8 @@ import { join } from 'path';
 import * as express from 'express';
 
 async function bootstrap() {
+
+  // Configuration app
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(

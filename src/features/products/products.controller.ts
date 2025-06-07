@@ -11,6 +11,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -29,6 +30,8 @@ import {
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileUploadService } from 'src/common/file-upload/file-upload.service';
+import { CategoriesService } from '../categories/categories.service';
+import { CategoryName } from '../categories/enums/category-name.enum';
 
 @ApiTags('products')
 @Controller('products')
@@ -39,6 +42,7 @@ export class ProductsController {
   constructor(
     private readonly productsService: ProductsService,
     private readonly fileUploadService: FileUploadService,
+    private readonly categoriesService: CategoriesService,
   ) {}
 
   @Post()
@@ -67,6 +71,22 @@ export class ProductsController {
   ) {
     try {
       let imageProductUrl: string | undefined = undefined;
+      let categories: Array<{ name: CategoryName; description?: string }> = [];
+
+      // Parse categories if exists
+      if (createProductDto.categories) {
+        try {
+          categories = JSON.parse(createProductDto.categories) as Array<{
+            name: CategoryName;
+            description?: string;
+          }>;
+        } catch (e) {
+          console.log(e);
+          throw new BadRequestException(
+            'Invalid category format. Must be a Array JSON ',
+          );
+        }
+      }
 
       if (image) {
         const fileName = await this.fileUploadService.uploadFile(image);
@@ -75,6 +95,7 @@ export class ProductsController {
 
       const createData = {
         ...createProductDto,
+        categories,
         ...(imageProductUrl && { image: imageProductUrl }),
       };
       return this.productsService.createProductItem(createData);
@@ -138,14 +159,34 @@ export class ProductsController {
   ) {
     try {
       let imageProductUrl: string | undefined = undefined;
+      let categories: Array<{ name: CategoryName; description?: string }> = [];
+
+      // Parse categories if exists
+     if (updateProductDto.categories) {
+        try {
+          if (typeof updateProductDto.categories === 'string') {
+            categories = JSON.parse(updateProductDto.categories) as Array<{
+              name: CategoryName;
+              description?: string;
+            }>;
+          } else {
+            categories = updateProductDto.categories;
+          }
+        } catch (e) {
+          console.log(e);
+          throw new BadRequestException(
+            'Invalid category format. Must be a Array JSON ',
+          );
+        }
+      }
 
       if (image) {
         const fileName = await this.fileUploadService.uploadFile(image);
         imageProductUrl = `/uploads/${fileName}`;
       }
-
       const updateData = {
         ...updateProductDto,
+        categories,
         ...(imageProductUrl && { image: imageProductUrl }),
       };
       return this.productsService.updateProductItem(id, updateData);

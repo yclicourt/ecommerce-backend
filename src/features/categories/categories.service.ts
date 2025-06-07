@@ -7,26 +7,54 @@ import { PrismaService } from 'src/common/prisma/prisma.service';
 export class CategoriesService {
   constructor(private readonly prisma: PrismaService) {}
 
+  // Method to create category item
   createCategoryItem(createCategoryDto: CreateCategoryDto) {
     return this.prisma.category.create({
       data: {
-        ...createCategoryDto,
+        name: createCategoryDto.name,
+        description: createCategoryDto.description,
+        product: {
+          connect: { id: createCategoryDto.productId },
+        },
       },
     });
   }
 
+  // Method to get all category items
   getAllCategoriesItems() {
     return this.prisma.category.findMany({});
   }
 
-  getCategoryItem(id: number) {
-    return this.prisma.category.findUnique({
+  // Method to get categories by a product
+  async getCategoriesByProducts(productId: number) {
+    const productFound = await this.prisma.product.findUnique({
       where: {
-        id,
+        id: productId,
+      },
+    });
+    if (!productFound) throw new HttpException('Product not found', 404);
+
+    return await this.prisma.category.findMany({
+      where: {
+        id: productFound.id,
       },
     });
   }
 
+  // Method to get a category item
+  async getCategoryItem(id: number) {
+    const categoryFound = await this.prisma.category.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!categoryFound) throw new HttpException('Category not found', 400);
+
+    return categoryFound;
+  }
+
+  // Method to update a category item
   async updateCategoryItem(id: number, updateCategoryDto: UpdateCategoryDto) {
     const categoryFound = await this.getCategoryItem(id);
 
@@ -43,6 +71,7 @@ export class CategoriesService {
     return categoryUpdated;
   }
 
+  // Method to delete a category
   async deleteCategory(id: number) {
     const categoryFound = await this.getCategoryItem(id);
 

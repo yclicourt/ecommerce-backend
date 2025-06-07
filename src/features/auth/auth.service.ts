@@ -101,28 +101,29 @@ export class AuthService {
     }
   }
 
+  // Method to validate and normalizes roles
   private validateAndNormalizeRoles(roles: unknown): Role[] {
-    // Si roles es undefined o null, devolver el valor por defecto
+    // If roles is undefined or null, return the default value
     if (!roles) {
       return [Role.USER];
     }
 
-    // Asegurarse que es un array
+    // Make sure it is an array
     if (!Array.isArray(roles)) {
       throw new Error('Formato de roles inválido: debe ser un array');
     }
 
-    // Normalizar roles
+    // Normalize roles
     const normalizedRoles = roles
       .map((role) => {
         if (typeof role === 'string') {
           const upperRole = role.toUpperCase().trim();
 
-          // Manejar posibles discrepancias de nombres
+          // Manage possible name discrepancies
           if (upperRole === 'ADMIN') return Role.ADMIN;
           if (upperRole === 'USER') return Role.USER;
 
-          // Verificar contra el enum
+          // Check against enum
           if (Object.values(Role).includes(upperRole as Role)) {
             return upperRole as Role;
           }
@@ -131,7 +132,7 @@ export class AuthService {
       })
       .filter((role): role is Role => role !== null);
 
-    // Si no hay roles válidos, devolver el valor por defecto
+    // If no valid roles, return the default value
     if (normalizedRoles.length === 0) {
       return [Role.USER];
     }
@@ -139,19 +140,19 @@ export class AuthService {
     return normalizedRoles;
   }
 
+  // Method to handle a forgot password
   async forgotPassword({ email }: ForgotPasswordDto) {
-    // 1. Verificar si el usuario existe
+    // Check if the user exists
     const user = await this.userService.getUserByEmail(email);
     if (!user) {
-      // Por seguridad, no revelamos si el email existe o no
       return { message: 'If the email exists, a reset link has been sent' };
     }
 
-    // 2. Generar token de reseteo
+    // Generate reset token
     const resetToken = crypto.randomBytes(32).toString('hex');
     const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hora de expiración
 
-    // 3. Guardar token en la base de datos
+    // Save token in the database
     await this.prisma.user.update({
       where: { email },
       data: {
@@ -160,7 +161,7 @@ export class AuthService {
       },
     });
 
-    // 4. Enviar email con el link de reseteo
+    // Send email with the reset link
     const resetUrl = `${this.configService.get<string>('ORIGIN_CLIENT')}/reset-password?token=${resetToken}`;
     try {
       await this.mailService.sendPasswordResetEmail(
@@ -175,13 +176,14 @@ export class AuthService {
     }
   }
 
+  // Method to handle a reset password
   async resetPassword(token: string, newPassword: string) {
-    // 1. Buscar usuario por token
+    //Search user by token
     const user = await this.prisma.user.findFirst({
       where: {
         resetToken: token,
         resetTokenExpiry: {
-          gt: new Date(), // Token no ha expirado
+          gt: new Date(), // Token no expired
         },
       },
     });
@@ -190,10 +192,10 @@ export class AuthService {
       throw new BadRequestException('Invalid or expired token');
     }
 
-    // 2. Hashear la nueva contraseña
+    //  Hash the new password
     const hashedPassword = await bcryptjs.hash(newPassword, 10);
 
-    // 3. Actualizar usuario
+    // Update user
     await this.prisma.user.update({
       where: { id: user.id },
       data: {

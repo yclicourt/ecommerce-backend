@@ -1,26 +1,41 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateProductDto } from './create-product.dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import {  IsOptional, IsString } from 'class-validator';
+import { CategoryName } from 'src/features/categories/enums/category-name.enum';
 
-export class UpdateProductDto extends PartialType(CreateProductDto) {
+export class UpdateProductDto {
+  @IsString()
+  @IsOptional()
   @ApiPropertyOptional({
     description: 'product name',
     example: 'Laptop',
   })
-  name?: string | undefined;
+  name: string;
+  @IsOptional()
   @ApiPropertyOptional({
     description: 'product description',
     example: 'Laptop HP',
   })
-  description?: string | undefined;
+  description?: string;
   @ApiPropertyOptional({
     description: 'product price',
     example: '3000',
   })
-  price?: string | undefined;
+  @IsString()
+  @IsOptional()
+  price?: string;
+
+  @IsString()
+  @IsOptional()
   @ApiPropertyOptional({
     description: 'product image',
     example: 'image.com',
   })
-  image?: string | undefined;
+  image?: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiPropertyOptional({
+    description: 'categories',
+  })
+  categories?: string | Array<{ name: CategoryName; description?: string }>;
 }
