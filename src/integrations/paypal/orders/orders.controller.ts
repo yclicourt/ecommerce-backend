@@ -37,8 +37,8 @@ export class OrdersController {
 
   @Get('capture-order')
   async captureOrderController(@Query('token') token: string) {
-    if(!token){
-      throw new HttpException('Token is required, please verify',400)
+    if (!token) {
+      throw new HttpException('Token is required, please verify', 400);
     }
     return this.ordersService.captureOrder(token);
   }
@@ -51,6 +51,16 @@ export class OrdersController {
   @Get()
   getAllOrdersController() {
     return this.ordersService.getAllOrdersItem();
+  }
+
+  @Get('stats/:userId')
+  getOrderStats(@Param('userId', ParseIntPipe) userId: number) {
+    return this.ordersService.getOrdersStats(userId);
+  }
+
+  @Get('revenue/:userId')
+  getMonthlyRevenue(@Param('userId', ParseIntPipe) userId: number) {
+    return this.ordersService.getMonthlyRevenueAlt(userId);
   }
 
   @Get(':id')

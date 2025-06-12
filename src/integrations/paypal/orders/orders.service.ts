@@ -14,6 +14,8 @@ import { PurchaseUnitDto } from './dto/purchase-unit.dto';
 import { PaypalCreateOrderDto } from './dto/create-order.dto';
 import { PayPalCaptureOrderResponse } from './interfaces/paypal-capture-order-response.interface';
 import { MailService } from 'src/integrations/mail/mail.service';
+import { MonthlyRevenue } from './interfaces/montly-revenue.interface';
+import { OrderWithUnits } from './interfaces/order-with-units.interface';
 
 @Injectable()
 export class OrdersService {
@@ -166,6 +168,75 @@ export class OrdersService {
   // Method to get all orders items
   async getAllOrdersItem() {
     return await this.prisma.order.findMany();
+  }
+
+  // Method to get stats of orders
+  async getOrdersStats(userId: number) {
+    const orders = this.prisma.order.findMany({
+      where: {
+        cart: {
+          some: {
+            userId,
+          },
+        },
+        statusOrder: 'COMPLETED',
+      },
+      include: {
+        cart: {
+          include: {
+            cartItems: true,
+          },
+        },
+      },
+    });
+    const totalRevenue = (await orders).reduce((sum, order) => {
+      const orderTotal = order.purchase_units.reduce(
+        (unitSum: number, unit: { amount: { value: string } }) => {
+          return unitSum + parseFloat(unit.amount.value);
+        },
+        0,
+      );
+      return sum + Number(orderTotal);
+    }, 0);
+
+    return {
+      totalRevenue,
+      totalOrders: (await orders).length,
+    };
+  }
+
+  // Method to get monthly revenue
+  async getMonthlyRevenueAlt(userId: number): Promise<MonthlyRevenue[]> {
+    const orders = (await this.prisma.order.findMany({
+      where: {
+        statusOrder: 'COMPLETED',
+        cart: {
+          some: { userId },
+        },
+      },
+      select: {
+        capturedAt: true,
+        purchase_units: true,
+      },
+    })) as unknown as OrderWithUnits[];
+
+    const monthlyData = orders.reduce((acc: Record<string, number>, order) => {
+      const month = order.capturedAt.toLocaleString('default', {
+        month: 'long',
+      });
+      const total = order.purchase_units.reduce((sum: number, unit) => {
+        const value = parseFloat(unit.value);
+        return isNaN(value) ? sum : sum + value;
+      }, 0);
+
+      acc[month] = (acc[month] || 0) + total;
+      return acc;
+    }, {});
+
+    return Object.entries(monthlyData).map(([month, revenue]) => ({
+      month,
+      revenue,
+    }));
   }
 
   // Method to get a order item
