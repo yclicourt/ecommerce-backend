@@ -27,6 +27,7 @@ import { AuthGuard } from '../auth/guard/auth.guard';
 import { RolesGuard } from '../auth/guard/role.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileUploadService } from 'src/common/file-upload/file-upload.service';
+import { Status } from './common/enums/status.enum';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -56,6 +57,20 @@ export class UsersController {
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   getUserController(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.getUserItem(id);
+  }
+
+  @Patch(':id/status')
+  @ApiOperation({ summary: 'Update user status' })
+  @ApiResponse({ status: 200, description: 'Status updated successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async updateUserStatusController(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { status: Status },
+  ) {
+    return this.usersService.updateUserStatus(id, {
+      status: body.status,
+      lastLogin: new Date(),
+    });
   }
 
   @Patch(':id')
