@@ -150,7 +150,7 @@ export class AuthService {
 
     // Generate reset token
     const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hora de expiración
+    const resetTokenExpiry = new Date(Date.now() + 3600000); 
 
     // Save token in the database
     await this.prisma.user.update({
@@ -183,7 +183,7 @@ export class AuthService {
       where: {
         resetToken: token,
         resetTokenExpiry: {
-          gt: new Date(), // Token no expired
+          gt: new Date(), // Token not expired
         },
       },
     });

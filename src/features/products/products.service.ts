@@ -26,7 +26,7 @@ export class ProductsService {
                 }>
               ).map((cat) => ({
                 name: cat.name,
-                description: cat.description || null, // Usar null en lugar de undefined
+                description: cat.description || null,
               })),
             }
           : undefined,

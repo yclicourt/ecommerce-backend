@@ -65,7 +65,7 @@ export class OrdersService {
             },
             quantity: item.quantity.toString(),
             description: item.description?.substring(0, 127) || '',
-          })) || [], // Array vacío como fallback
+          })) || [],
       }),
     );
 
@@ -78,7 +78,7 @@ export class OrdersService {
         cancel_url: `${process.env.ORIGIN_CLIENT}/order/cancel`,
         brand_name: process.env.BRAND_NAME || 'My Store',
         user_action: 'PAY_NOW',
-        shipping_preference: 'NO_SHIPPING', // O 'GET_FROM_FILE' si necesitas envío
+        shipping_preference: 'NO_SHIPPING',
       },
     };
     const paypalResponse = await axios.post<PayPalOrderResponse>(
