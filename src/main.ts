@@ -10,9 +10,9 @@ async function bootstrap() {
 
   // Constant to handle different origins
   const allowedOrigins = [
-    process.env.ORIGIN_CLIENT_PRODUCTION,
-    process.env.ORIGIN_CLIENT_DEVELOPMENT,
-  ];
+    process.env.ORIGIN_CLIENT_PRODUCTION?.replace(/\/$/, ""),
+    process.env.ORIGIN_CLIENT_DEVELOPMENT?.replace(/\/$/, ""),
+  ].filter(Boolean); // Filter out any undefined or empty strings
 
   // Configuration app
   const app = await NestFactory.create(AppModule);
@@ -34,11 +34,13 @@ async function bootstrap() {
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       } else {
+        console.error("CORS Blocked:", origin);
         return callback(new Error('Not allowed by CORS'));
       }
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
   });
 
   // Serve static files
