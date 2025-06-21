@@ -8,6 +8,12 @@ import * as express from 'express';
 
 async function bootstrap() {
 
+  // Constant to handle different origins
+  const allowedOrigins = [
+    process.env.ORIGIN_CLIENT_PRODUCTION,
+    process.env.ORIGIN_CLIENT_DEVELOPMENT,
+  ];
+
   // Configuration app
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api/v1');
@@ -21,7 +27,16 @@ async function bootstrap() {
 
   // Enable CORS
   app.enableCors({
-    origin: process.env.ORIGIN_CLIENT,
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+      // Permit requests without origin (like Postman or curl)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
