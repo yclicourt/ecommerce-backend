@@ -1,8 +1,17 @@
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('ADMIN', 'MANAGER', 'GUEST', 'USER');
+CREATE TYPE "Role" AS ENUM ('ADMIN', 'USER');
+
+-- CreateEnum
+CREATE TYPE "Status" AS ENUM ('ACTIVE', 'INACTIVE');
+
+-- CreateEnum
+CREATE TYPE "StatusOrder" AS ENUM ('CREATED', 'SAVED', 'APPROVED', 'VOIDED', 'COMPLETED', 'PAYER_ACTION_REQUIRED');
 
 -- CreateEnum
 CREATE TYPE "INTENT" AS ENUM ('CAPTURE', 'AUTHORIZE');
+
+-- CreateEnum
+CREATE TYPE "CategoryName" AS ENUM ('SHOES', 'FASHIONS', 'ELECTRONICS');
 
 -- CreateTable
 CREATE TABLE "Product" (
@@ -11,8 +20,8 @@ CREATE TABLE "Product" (
     "description" TEXT DEFAULT '',
     "price" DOUBLE PRECISION NOT NULL,
     "image" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3),
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );
@@ -20,32 +29,34 @@ CREATE TABLE "Product" (
 -- CreateTable
 CREATE TABLE "Category" (
     "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
+    "name" "CategoryName" NOT NULL DEFAULT 'SHOES',
     "description" TEXT DEFAULT '',
-    "icon" TEXT,
     "productId" INTEGER NOT NULL,
-    "subcategoryId" INTEGER NOT NULL,
 
     CONSTRAINT "Category_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "SubCategory" (
-    "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
-    "url" TEXT NOT NULL,
-
-    CONSTRAINT "SubCategory_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Order" (
     "id" SERIAL NOT NULL,
     "intent" "INTENT" NOT NULL DEFAULT 'CAPTURE',
+    "paypalOrderId" TEXT,
+    "capturedAt" TIMESTAMP(3),
     "purchase_units" JSONB[],
     "application_context" JSONB NOT NULL,
+    "statusOrder" "StatusOrder" NOT NULL DEFAULT 'CREATED',
 
     CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Transaction" (
+    "id" TEXT NOT NULL,
+    "statusTransactions" "StatusOrder" NOT NULL DEFAULT 'CREATED',
+    "purchase_units" JSONB[],
+    "payer" JSONB NOT NULL,
+
+    CONSTRAINT "Transaction_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -68,6 +79,7 @@ CREATE TABLE "Cart" (
 CREATE TABLE "CartItem" (
     "id" SERIAL NOT NULL,
     "productId" INTEGER NOT NULL,
+    "name" TEXT NOT NULL,
     "quantity" INTEGER NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "addedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -78,24 +90,35 @@ CREATE TABLE "CartItem" (
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
-    "name" TEXT DEFAULT 'user name',
-    "lastname" TEXT DEFAULT 'user lastname',
+    "name" TEXT NOT NULL DEFAULT 'user name',
+    "lastname" TEXT NOT NULL DEFAULT 'user lastname',
     "email" TEXT NOT NULL,
+    "phone" TEXT NOT NULL,
     "address" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "avatar" TEXT,
+    "status" "Status" NOT NULL DEFAULT 'INACTIVE',
+    "lastLogin" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "role" "Role"[] DEFAULT ARRAY['USER']::"Role"[],
+    "resetToken" TEXT,
+    "resetTokenExpiry" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Order_paypalOrderId_key" ON "Order"("paypalOrderId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_phone_key" ON "User"("phone");
 
 -- AddForeignKey
 ALTER TABLE "Category" ADD CONSTRAINT "Category_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Category" ADD CONSTRAINT "Category_subcategoryId_fkey" FOREIGN KEY ("subcategoryId") REFERENCES "SubCategory"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Cart" ADD CONSTRAINT "Cart_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
