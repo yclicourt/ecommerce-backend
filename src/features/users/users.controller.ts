@@ -99,7 +99,11 @@ export class UsersController {
 
       if (avatar) {
         const fileName = await this.fileUploadService.uploadFile(avatar);
-        avatarUrl = `/uploads/${fileName}`;
+
+        avatarUrl =
+          process.env.NODE_ENV === 'production'
+            ? fileName // Cloudinary URL
+            : `/uploads/${fileName}`; // Local file path
       }
 
       const updateData = {

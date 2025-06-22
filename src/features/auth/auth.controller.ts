@@ -49,7 +49,10 @@ export class AuthController {
         const fileName = await this.fileUploadService.uploadFile(avatar);
 
         // Build the full URL that will be served statically
-        avatarUrl = `/uploads/${fileName}`;
+        avatarUrl =
+          process.env.NODE_ENV === 'production'
+            ? fileName // Cloudinary URL
+            : `/uploads/${fileName}`; // Local file path
       }
 
       const userData = {
