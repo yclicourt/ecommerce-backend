@@ -90,7 +90,10 @@ export class ProductsController {
 
       if (image) {
         const fileName = await this.fileUploadService.uploadFile(image);
-        imageProductUrl = `/uploads/${fileName}`;
+        imageProductUrl =
+          process.env.NODE_ENV === 'production'
+            ? fileName // Cloudinary URL
+            : `/uploads/${fileName}`; // Local file path
       }
 
       const createData = {
@@ -162,7 +165,7 @@ export class ProductsController {
       let categories: Array<{ name: CategoryName; description?: string }> = [];
 
       // Parse categories if exists
-     if (updateProductDto.categories) {
+      if (updateProductDto.categories) {
         try {
           if (typeof updateProductDto.categories === 'string') {
             categories = JSON.parse(updateProductDto.categories) as Array<{
@@ -182,7 +185,10 @@ export class ProductsController {
 
       if (image) {
         const fileName = await this.fileUploadService.uploadFile(image);
-        imageProductUrl = `/uploads/${fileName}`;
+        imageProductUrl =
+          process.env.NODE_ENV === 'production'
+            ? fileName // Cloudinary URL
+            : `/uploads/${fileName}`; // Local file path
       }
       const updateData = {
         ...updateProductDto,

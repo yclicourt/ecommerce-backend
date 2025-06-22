@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { HttpException, Injectable } from '@nestjs/common';
 import {
   PAYPAL_API,
@@ -16,6 +15,7 @@ import { PayPalCaptureOrderResponse } from './interfaces/paypal-capture-order-re
 import { MailService } from 'src/integrations/mail/mail.service';
 import { MonthlyRevenue } from './interfaces/montly-revenue.interface';
 import { OrderWithUnits } from './interfaces/order-with-units.interface';
+
 
 @Injectable()
 export class OrdersService {

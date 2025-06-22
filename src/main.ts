@@ -7,11 +7,10 @@ import { join } from 'path';
 import * as express from 'express';
 
 async function bootstrap() {
-
   // Constant to handle different origins
   const allowedOrigins = [
-    process.env.ORIGIN_CLIENT_PRODUCTION?.replace(/\/$/, ""),
-    process.env.ORIGIN_CLIENT_DEVELOPMENT?.replace(/\/$/, ""),
+    process.env.ORIGIN_CLIENT_PRODUCTION?.replace(/\/$/, ''),
+    process.env.ORIGIN_CLIENT_DEVELOPMENT?.replace(/\/$/, ''),
   ].filter(Boolean); // Filter out any undefined or empty strings
 
   // Configuration app
@@ -27,14 +26,17 @@ async function bootstrap() {
 
   // Enable CORS
   app.enableCors({
-    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) => {
       // Permit requests without origin (like Postman or curl)
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       } else {
-        console.error("CORS Blocked:", origin);
+        console.error('CORS Blocked:', origin);
         return callback(new Error('Not allowed by CORS'));
       }
     },
