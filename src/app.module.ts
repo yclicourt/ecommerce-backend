@@ -12,7 +12,6 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { FileUploadService } from './common/file-upload/file-upload.service';
-import { FileUploadCloudinaryService } from './common/file-upload/file-upload-cloudinary.service';
 
 @Module({
   imports: [
@@ -52,6 +51,6 @@ import { FileUploadCloudinaryService } from './common/file-upload/file-upload-cl
   ],
   controllers: [],
 
-  providers: [FileUploadService,FileUploadCloudinaryService],
+  providers: [FileUploadService],
 })
 export class AppModule {}

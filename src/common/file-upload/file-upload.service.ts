@@ -11,7 +11,7 @@ export class FileUploadService {
     // You can inject ConfigService if you need to access environment variables
     // or other configuration settings.
     cloudinary.config({
-      cloud_name: this.configService.get('CLOUDINARY_CLOUD_NAME'),
+      cloud_name: this.configService.get('CLOUDINARY_NAME'),
       api_key: this.configService.get('CLOUDINARY_API_KEY'),
       api_secret: this.configService.get('CLOUDINARY_API_SECRET'),
     });
