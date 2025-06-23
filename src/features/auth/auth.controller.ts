@@ -50,7 +50,7 @@ export class AuthController {
 
         // Build the full URL that will be served statically
         avatarUrl =
-          process.env.NODE_ENV === 'production'
+          process.env.NODE_ENV === 'production' && (fileName.startsWith('http') || fileName.startsWith('https'))
             ? fileName // Cloudinary URL
             : `/uploads/${fileName}`; // Local file path
       }

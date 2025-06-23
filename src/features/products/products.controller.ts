@@ -91,7 +91,7 @@ export class ProductsController {
       if (image) {
         const fileName = await this.fileUploadService.uploadFile(image);
         imageProductUrl =
-          process.env.NODE_ENV === 'production'
+          process.env.NODE_ENV === 'production' && (fileName.startsWith('http') || fileName.startsWith('https'))
             ? fileName // Cloudinary URL
             : `/uploads/${fileName}`; // Local file path
       }
@@ -186,7 +186,7 @@ export class ProductsController {
       if (image) {
         const fileName = await this.fileUploadService.uploadFile(image);
         imageProductUrl =
-          process.env.NODE_ENV === 'production'
+          process.env.NODE_ENV === 'production' && (fileName.startsWith('http') || fileName.startsWith('https'))
             ? fileName // Cloudinary URL
             : `/uploads/${fileName}`; // Local file path
       }
