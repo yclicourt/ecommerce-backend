@@ -18,6 +18,7 @@ import { ConfigService } from '@nestjs/config';
 import { MailService } from 'src/integrations/mail/mail.service';
 import { Status } from '../users/common/enums/status.enum';
 import { RegisterUserPayload } from './interfaces/register-user-payload.interface';
+import { RegisterUserAdminPayload } from './interfaces/register-user-admin-payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -55,6 +56,29 @@ export class AuthService {
       address,
       email,
     };
+  }
+
+  async registerUserAdmin({
+    role,
+    avatar,
+    ...registerAdminData
+  }: RegisterUserAdminPayload) {
+    const user = await this.userService.getUserByEmail(registerAdminData.email);
+
+    if (user) throw new HttpException('User already exists', 400);
+
+    try{
+      await this.userService.createUserItem({
+      role,
+      avatar,
+      ...registerAdminData,
+      password: await bcryptjs.hash(registerAdminData.password, 10),
+    });
+    return new HttpException('User created succeffully',201)
+    }catch(error){
+      console.log(error)
+      throw new HttpException('User not created',404)
+    }
   }
 
   async loginUser({ email, password }: LoginAuthDto) {
@@ -150,7 +174,7 @@ export class AuthService {
 
     // Generate reset token
     const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetTokenExpiry = new Date(Date.now() + 3600000); 
+    const resetTokenExpiry = new Date(Date.now() + 3600000);
 
     // Save token in the database
     await this.prisma.user.update({
