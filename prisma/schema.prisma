@@ -111,6 +111,7 @@ enum Role {
 enum Status {
   ACTIVE
   INACTIVE
+  OFFLINE
 }
 
 enum StatusOrder {
