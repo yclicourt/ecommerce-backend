@@ -1,80 +1,93 @@
-# Ecommerce Backend
+# Ecommerce Backend — NestJS
 
-Backend del proyecto ecommerce desarrollado con NestJS.
+REST API for the ecommerce platform, built with **NestJS** + **TypeScript** and **PostgreSQL** via **Prisma ORM**. Serves the [ecommerce-frontend-angular](https://github.com/yclicourt/ecommerce-frontend-angular) storefront (Angular 18).
 
-## 🛠️ Stack
+## ✨ Features
 
-- [NestJS](https://nestjs.com/)
-- [TypeScript](https://www.typescriptlang.org/)
-- [PostgreSQL](https://www.postgresql.org/) (o tu base de datos preferida)
-- [PrismaORM](https://prisma.io/)
-- [Jest](https://jestjs.io/) para testing
-- [PayPal](https://www.paypal.com/) (integración para pagos)
-- [Gmail](https://mail.google.com/) (envío de mensajes de confirmación de pagos)
+- JWT authentication & user management
+- Products & categories
+- Cart & order flow
+- PayPal payment integration
+- Order confirmation emails (Nodemailer)
+- Interactive API docs with Swagger
+- Unit & e2e tests with Jest
 
-## Instalación
+## 🛠️ Tech Stack
 
-1. Clona el repositorio:
-  ```bash
-  git clone https://github.com/tu-usuario/ecommerce-backend.git
-  cd ecommerce-backend
-  ```
+- **Framework:** NestJS + TypeScript
+- **Database:** PostgreSQL
+- **ORM:** Prisma
+- **Auth:** JWT
+- **Payments:** PayPal REST API
+- **Emails:** Nodemailer (Gmail SMTP)
+- **API docs:** Swagger / OpenAPI
+- **Testing:** Jest
 
-2. Instala las dependencias:
-  ```bash
-  npm install
-  ```
+## 🚀 Getting Started
 
-3. Configura las variables de entorno en un archivo `.env`.
+### Prerequisites
 
-```
-  DATABASE_URL="postgresql://username:password@host:port/db?schema=public"
-  JWT='secret'
-  PORT=4000
-  PAYPAL_API_SECRET=''
-  PAYPAL_API_CLIENT= ""
-  PAYPAL_API = 'https://api-m.sandbox.paypal.com'
-  ORIGIN_CLIENT= ''
-  BRAND_NAME = Application Name
-  SMTP_HOST=
-  SMTP_PORT=
-  SMTP_USER=
-  SMTP_PASSWORD=
-  SMTP_FROM_EMAIL=
+- Node.js 20+
+- PostgreSQL 14+
 
+### Installation
+
+```bash
+git clone https://github.com/yclicourt/ecommerce-backend.git
+cd ecommerce-backend
+npm install
 ```
 
-4. Ejecuta las migraciones (si aplica):
-  ```bash
-    npx prisma init
-  ```
-  ```bash
-    npx prisma migrate dev --name init
-  ```
+### Environment
 
-5. Inicia el servidor:
-  ```bash
-    npm run start:dev
-  ```
+Create a `.env` file in the project root:
 
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/ecommerce"
+JWT_SECRET="change-me"
+PORT=4000
+PAYPAL_API_CLIENT="your-paypal-client-id"
+PAYPAL_API_SECRET="your-paypal-client-secret"
+PAYPAL_API="https://api-m.sandbox.paypal.com"
+ORIGIN_CLIENT="http://localhost:4200"
+BRAND_NAME="My Store"
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT=587
+SMTP_USER="you@gmail.com"
+SMTP_PASS="your-app-password"
+SMTP_FROM_EMAIL="you@gmail.com"
+```
 
-## Documentación de la API
+### Database
 
-  La documentación de la API está disponible mediante Swagger. Una vez iniciado el servidor, accede a `http://IP-HOST:PORT/api/v1/docs` para ver la documentación interactiva.
+```bash
+npx prisma migrate dev
+```
 
-  ![Swagger API Documentation](./uploads/doc_back_swagger.png)
+### Run locally
 
+```bash
+npm run start:dev   # watch mode -> http://localhost:4000
+```
 
-## Test
+## 📖 API documentation
 
-  Ejecuta los tests con:
+Swagger UI is available at `http://localhost:4000/api/v1/docs` once the server is running.
 
-  ```bash
-  npm run test
-  ```
+![Swagger API documentation](./uploads/doc_back_swagger.png)
 
-  Para ver la cobertura de tests:
+## ✅ Tests
 
-  ```bash
-  npm run test:cov
-  ```
+```bash
+npm run test        # unit tests
+npm run test:cov    # coverage report
+npm run test:e2e    # e2e tests
+```
+
+## 🤝 Related repositories
+
+- [ecommerce-frontend-angular](https://github.com/yclicourt/ecommerce-frontend-angular) — Angular 18 storefront for this API
+
+## 📄 License
+
+MIT
